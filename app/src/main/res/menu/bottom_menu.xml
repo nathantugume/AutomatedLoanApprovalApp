@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/favorite"
+        android:icon="@drawable/ic_notifications"
+        android:title="notifications"/>
+
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_account"
+        android:title="account"/>
+    <item
+        android:id="@+id/fab"
+        android:title=""
+
+    />
+    <item
+        android:id="@+id/favorit"
+        android:icon="@drawable/ic_notifications"
+        android:title="notifications"
+   />
+
+    <item
+        android:id="@+id/searc"
+        android:icon="@drawable/ic_account"
+        android:title="account"
+      />
+
+
+
+</menu>

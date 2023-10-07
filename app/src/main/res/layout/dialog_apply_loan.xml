@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- TextView to display loan limit -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textViewLoanLimit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loan Limit: $1000"
+        style="@style/Widget.MaterialComponents.TextView"/>
+
+    <!-- Options for applying for a loan -->
+    <!-- Add your Material Components UI components here, such as TextInputLayout, RadioButtons, etc. -->
+
+    <!-- TextView to display repayment amount -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textViewRepaymentAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Repayment Amount: $0"
+        style="@style/Widget.MaterialComponents.TextView"/>
+
+    <!-- Button to confirm and apply for the loan -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonApplyLoan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply Now"
+        style="@style/Widget.MaterialComponents.Button"/>
+
+</LinearLayout>

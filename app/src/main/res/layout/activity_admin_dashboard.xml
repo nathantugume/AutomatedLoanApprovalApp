@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/drawerLayout"
+    tools:openDrawer="start"
+    tools:context=".ui.admin.AdminDashboardActivity"
+    >
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        >
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            >
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                app:menu="@menu/top_app_bar"
+                app:navigationIcon="@drawable/ic_menu"
+                app:title="Dashboard"
+                android:background="#6AAE20"
+                app:layout_scrollFlags="enterAlways|snap"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Note: A RecyclerView can also be used -->
+        <androidx.core.widget.NestedScrollView
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:background="#e7f1e7"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp"
+                        android:id="@+id/users_card"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/usermgt"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:text="Manage Users"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp"
+                        android:id="@+id/reports"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/report"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:text="Reports"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp"
+                        android:id="@+id/loan_mgt"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/loan"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textAlignment="center"
+                                android:layout_height="wrap_content"
+                                android:text="Loan  Management"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp"
+                        android:id="@+id/admin_transaction_card"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/transaction_history"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textAlignment="center"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:text="Transactions"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        android:background="@color/white"
+                        app:cardElevation="5dp"
+                       android:id="@+id/update_card"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/updated"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:text="System Update"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="5dp"
+                       android:id="@+id/settings"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="5dp"
+                                android:src="@mipmap/settings"
+                                android:layout_gravity="center"
+                                />
+                            <TextView
+                                android:layout_marginTop="5sp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_width="wrap_content"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:text="Settings"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+            <!-- Scrollable content -->
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="217dp"
+        android:layout_height="match_parent"
+        app:headerLayout="@layout/admin_header_navigation_drawer"
+        app:menu="@menu/navigation_drawer"
+        tools:openDrawer="start"
+        android:layout_gravity="start"
+
+
+        />
+</androidx.drawerlayout.widget.DrawerLayout>

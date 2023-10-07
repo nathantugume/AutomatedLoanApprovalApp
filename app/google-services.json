@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "881710289758",
+    "project_id": "automatedloanapprovalapp",
+    "storage_bucket": "automatedloanapprovalapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881710289758:android:6cd633c8941d36929375cf",
+        "android_client_info": {
+          "package_name": "com.example.automatedloanapprovalapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0AqFrP3SzGe7SoIDnSvMrloKj0-wKQp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
