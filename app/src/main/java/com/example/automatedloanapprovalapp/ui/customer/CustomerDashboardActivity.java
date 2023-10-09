@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
@@ -24,10 +23,9 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.Date;
 import java.util.Objects;
@@ -49,14 +47,18 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         // ...
 
         CardView loan_application = findViewById(R.id.loan_application);
-        loan_application.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Handle loan application button click here
-                // For example, start a new activity for loan application form
-                 Intent intent = new Intent(CustomerDashboardActivity.this, LoanApplicationActivity.class);
-                 startActivity(intent);
-            }
+        CardView application_status = findViewById(R.id.application_status_card);
+
+
+        application_status.setOnClickListener(view -> {
+            Intent intent = new Intent(CustomerDashboardActivity.this, ApplicationStatusActivity.class);
+            startActivity(intent);
+        });
+        loan_application.setOnClickListener(view -> {
+            // Handle loan application button click here
+            // For example, start a new activity for loan application form
+             Intent intent = new Intent(CustomerDashboardActivity.this, LoanApplicationActivity.class);
+             startActivity(intent);
         });
 
         // Check and request location permission

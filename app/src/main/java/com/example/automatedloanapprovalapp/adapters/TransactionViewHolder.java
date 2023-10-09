@@ -30,7 +30,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
     FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private TransactionAdapter.OnTransactionClickListener listener;
 
-    public TransactionViewHolder(@NonNull View itemView) {
+    public TransactionViewHolder(@NonNull View itemView, List<Transaction> transactions, TransactionAdapter.OnTransactionClickListener listener) {
         super(itemView);
         dateTextView = itemView.findViewById(R.id.dateTextView);
         loanTypeTextView = itemView.findViewById(R.id.loanTypeTextView);
@@ -40,6 +40,8 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
         userNameTextView = itemView.findViewById(R.id.customerNameTextView);
         acceptImage = itemView.findViewById(R.id.approve);
         declineImage = itemView.findViewById(R.id.decline);
+        this.transactions = transactions;
+        this.listener = listener;
 
 
     }

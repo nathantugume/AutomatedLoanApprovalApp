@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,15 +13,25 @@ import android.widget.Toast;
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.adapters.TransactionAdapter;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
+import com.example.automatedloanapprovalapp.classes.MobileMoneyPayoutTask;
 import com.example.automatedloanapprovalapp.classes.Transaction;
+import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ManageApplicationActivity extends AppCompatActivity implements TransactionAdapter.OnTransactionClickListener{
 
@@ -88,6 +100,42 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
 
     @Override
     public void onTransactionClick(String transactionId) {
-        Toast.makeText(this, "clicked "+transactionId, Toast.LENGTH_SHORT).show();
+        UserManager userManager = new UserManager(this);
+        String uid = userManager.getCurrentUser().getUid();
+        String approvedBy = userManager.getCurrentUser().getDisplayName(); // Get the name of the user who approved the transaction
+
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put("status", "approved");
+        updateData.put("approvedBy", uid);
+
+        firestoreCRUD.updateDocumentFields("transaction", transactionId,updateData, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    // Call the disburseFunds function after updating the status
+//                    disburseFunds(transactionId);
+                    MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask();
+                    payoutTask.execute();
+                    Toast.makeText(ManageApplicationActivity.this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
+
+                }else {
+                    Toast.makeText(ManageApplicationActivity.this, "Failed to approve loan, please try again!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+
+
+
+        });
+      //  Toast.makeText(this, "clicked "+transactionId, Toast.LENGTH_SHORT).show();
     }
+//    private void disburseFunds(String transactionId) {
+//        // To execute the task, create an instance of DisburseFundsTask and call execute():
+//        MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask();
+//        payoutTask.execute();
+//        Toast.makeText(this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
+//    }
+
+
+
 }
