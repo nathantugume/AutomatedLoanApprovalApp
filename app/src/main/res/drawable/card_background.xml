@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#80FF4081" /> <!-- 80 is the opacity value, ranges from 00 to FF (00 is fully transparent, FF is fully opaque) -->
+    <corners android:radius="10dp" /> <!-- Set corner radius as per your preference -->
+</shape>

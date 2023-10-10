@@ -1,6 +1,7 @@
 package com.example.automatedloanapprovalapp.ui.customer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -43,13 +44,16 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         // Initialize the fused location provider client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Your other initialization code for toolbar, drawer, and card view
-        // ...
-
         CardView loan_application = findViewById(R.id.loan_application);
         CardView application_status = findViewById(R.id.application_status_card);
+        CardView eligibility_checkCard = findViewById(R.id.eligibility_checkCard);
+        CardView repaymentCard = findViewById(R.id.loan_repayment_card);
 
 
+        repaymentCard.setOnClickListener(view -> {
+            Intent intent = new Intent(CustomerDashboardActivity.this,RepaymentActivity.class);
+            startActivity(intent);
+        });
         application_status.setOnClickListener(view -> {
             Intent intent = new Intent(CustomerDashboardActivity.this, ApplicationStatusActivity.class);
             startActivity(intent);
@@ -57,10 +61,16 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         loan_application.setOnClickListener(view -> {
             // Handle loan application button click here
             // For example, start a new activity for loan application form
-             Intent intent = new Intent(CustomerDashboardActivity.this, LoanApplicationActivity.class);
-             startActivity(intent);
+            Intent intent = new Intent(CustomerDashboardActivity.this, LoanApplicationActivity.class);
+            startActivity(intent);
         });
-
+        eligibility_checkCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CustomerDashboardActivity.this, EligibilityCheckActivity.class);
+                startActivity(intent);
+            }
+        });
         // Check and request location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -71,6 +81,7 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void getUserLocation() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);

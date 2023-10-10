@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#f7f7f8"
+    tools:context=".ui.customer.ApplicationStatusActivity"
     tools:layout_editor_absoluteX="27dp"
     tools:layout_editor_absoluteY="-43dp">
 
@@ -39,11 +40,12 @@
         tools:layout_editor_absoluteY="15dp">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+            android:id="@+id/disbursedCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="9dp"
             android:layout_marginStart="20dp"
+            android:visibility="gone"
             app:cardElevation="16dp"
             app:cardCornerRadius="10dp"
             android:backgroundTint="@color/white"
@@ -84,7 +86,7 @@
                     android:id="@+id/txt_disbursed_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1000000"
+                    android:text=""
                     android:paddingStart="10dp"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -94,7 +96,7 @@
                     android:id="@+id/dateDisbursed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2/1/2023"
+                    android:text=""
                     android:textSize="14sp"
                     android:paddingStart="8dp"
                     />
@@ -139,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:text="2/1/2023"
+                    android:text=""
                     android:textSize="14sp"
                     tools:layout_editor_absoluteX="230dp"
                     tools:layout_editor_absoluteY="250dp" />
@@ -195,6 +197,7 @@
             app:layout_constraintVertical_bias="0.216" />
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/partialPaymentCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="18dp"
@@ -237,7 +240,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:text="100000"
+                    android:text=""
                     android:textSize="18sp"
                     />
             </LinearLayout>
@@ -258,6 +261,7 @@
             app:layout_constraintVertical_bias="0.285" />
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/paymentCompleteCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
@@ -297,7 +301,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:text="100000"
+                    android:text=""
                     android:textSize="14sp"
                     />
 
@@ -306,7 +310,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:text="2/1/2023"
+                    android:text=""
                     android:textSize="14sp"
                     tools:layout_editor_absoluteX="31dp"
                     tools:layout_editor_absoluteY="358dp" />
@@ -315,12 +319,13 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
+            android:id="@+id/approvedCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
             app:cardElevation="16dp"
             app:cardCornerRadius="10dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/materialDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/materialDivider"
@@ -358,9 +363,8 @@
                 <TextView
                     android:id="@+id/approved_email"
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-                    android:text="example@email.com"
+                    android:text=""
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -369,7 +373,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:text="2/1/2023"
+                    android:text=""
                     android:textSize="14sp"
                     tools:layout_editor_absoluteX="230dp"
                     tools:layout_editor_absoluteY="250dp" />

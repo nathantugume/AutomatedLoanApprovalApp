@@ -84,6 +84,7 @@
 
                     </androidx.cardview.widget.CardView>
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/loan_repayment_card"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_margin="10dp"
@@ -125,6 +126,7 @@
                     android:gravity="center"
                     >
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/eligibility_checkCard"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_margin="10dp"

@@ -27,10 +27,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ManageApplicationActivity extends AppCompatActivity implements TransactionAdapter.OnTransactionClickListener{
@@ -102,11 +106,19 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
     public void onTransactionClick(String transactionId) {
         UserManager userManager = new UserManager(this);
         String uid = userManager.getCurrentUser().getUid();
-        String approvedBy = userManager.getCurrentUser().getDisplayName(); // Get the name of the user who approved the transaction
+        // Get the current date and time
 
+        Date currentDate = Calendar.getInstance().getTime();
+
+        // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String formattedDate = dateFormat.format(currentDate);
         Map<String, Object> updateData = new HashMap<>();
         updateData.put("status", "approved");
         updateData.put("approvedBy", uid);
+        updateData.put("approvedDate",formattedDate);
+
+
 
         firestoreCRUD.updateDocumentFields("transaction", transactionId,updateData, new OnCompleteListener<Void>() {
             @Override
@@ -114,8 +126,34 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                 if (task.isSuccessful()){
                     // Call the disburseFunds function after updating the status
 //                    disburseFunds(transactionId);
-                    MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask();
-                    payoutTask.execute();
+                    firestoreCRUD.readDocument("transaction", transactionId, new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()){
+                                DocumentSnapshot documentSnapshot = task.getResult();
+                                String customerID = documentSnapshot.getString("userId");
+                                int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
+                                firestoreCRUD.readDocument("users", customerID, new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()){
+                                            DocumentSnapshot snapshot = task.getResult();
+                                            String phoneNumber = snapshot.getString("phoneNumber");
+                                            Transaction transaction = new Transaction();
+                                            transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId);
+                                        }else
+                                        {
+                                            Toast.makeText(ManageApplicationActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+
+
+                            }
+                        }
+                    });
+
+
                     Toast.makeText(ManageApplicationActivity.this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
 
                 }else {

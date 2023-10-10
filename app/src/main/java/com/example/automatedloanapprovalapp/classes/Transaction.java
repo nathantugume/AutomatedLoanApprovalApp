@@ -1,5 +1,20 @@
 package com.example.automatedloanapprovalapp.classes;
 
+import android.content.Context;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class Transaction {
     private String userId;
     private String loanType;
@@ -101,15 +116,28 @@ public class Transaction {
         this.userName = userName;
     }
 
-    public void disburseFunds() {
-        if ("approved".equals(status)) {
-            // Implement disbursement logic here
-            // For example, you can call an API to transfer funds, update database records, etc.
-            // This method will be called when the transaction is approved
-            // You can access the transaction details using the attributes of this Transaction object
-        } else {
-            // Handle error: Attempting to disburse funds for a non-approved transaction
-            throw new IllegalStateException("Cannot disburse funds for a non-approved transaction");
-        }
+    public void disburseFunds(Context context,String phone, int amount, String docId) {
+       try {
+           Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
+            FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
+           // Get the current date and time
+           Date currentDate = Calendar.getInstance().getTime();
+
+           // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
+           SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+           String formattedDate = dateFormat.format(currentDate);
+           Map<String, Object> updateData = new HashMap<>();
+           updateData.put("status", "disbursed");
+           updateData.put("disbursedDate",formattedDate);
+           firestoreCRUD.updateDocumentFields("transaction", docId, updateData, new OnCompleteListener<Void>() {
+               @Override
+               public void onComplete(@NonNull Task<Void> task) {
+                   Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show();
+               }
+           });
+
+       }catch (Exception e){
+           Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+       }
     }
 }

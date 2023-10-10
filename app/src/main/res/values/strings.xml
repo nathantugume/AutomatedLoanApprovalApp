@@ -15,4 +15,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="maximum_loan_amount">Maximum Credit:</string>
     <string name="enter_loan_amount">Enter Loan Amount</string>
+    <string name="title_activity_eligibility_check">EligibilityCheckActivity</string>
 </resources>
