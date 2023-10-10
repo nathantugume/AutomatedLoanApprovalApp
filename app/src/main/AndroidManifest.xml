@@ -21,7 +21,7 @@
         <activity
             android:name=".ui.customer.EligibilityCheckActivity"
             android:exported="false" />
-        
+
         <activity
             android:name=".ui.customer.ApplicationStatusActivity"
             android:exported="false" />
