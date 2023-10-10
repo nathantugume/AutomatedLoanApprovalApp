@@ -66,7 +66,7 @@ public class SplashActivity extends AppCompatActivity {
                                 if (task1.isSuccessful()) {
                                     // Add user with role "default" to Firestore users collection
                                   String uid =  mAuth.getCurrentUser().getUid();
-                                    User defaultUser = new User("admin","admin2@loanapp.com","admin@1234", "default");
+                                    User defaultUser = new User("admin","admin@loanapp.com","admin@1234", "default");
                                     firestore.collection("users").document(uid).set(defaultUser);
                                 }
                             });
