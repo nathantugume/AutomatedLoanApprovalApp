@@ -3,6 +3,7 @@ package com.example.automatedloanapprovalapp.ui.customer;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -14,6 +15,9 @@ import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class CustomerDetailsActivity extends AppCompatActivity {
 
@@ -32,6 +36,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         TextView jobTitleTextView = findViewById(R.id.jobTitleTextView);
         TextView monthlyIncomeTextView = findViewById(R.id.monthlyIncomeTextView);
         TextView nationalIDTextView = findViewById(R.id.nationalIDTextView);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 
         FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
         UserManager userManager = new UserManager(CustomerDetailsActivity.this);
@@ -39,6 +44,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         String uid = userManager.getCurrentUser().getUid();
 
      firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
+         @SuppressLint("SetTextI18n")
          @Override
          public void onComplete(@NonNull Task<DocumentSnapshot> task) {
              if (task.isSuccessful()){
@@ -53,7 +59,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                  businessTypeTextView.setText(information.getBusinessType());
                  genderTextView.setText(information.getGender());
                  jobTitleTextView.setText(information.getJobTitle());
-                 monthlyIncomeTextView.setText(String.valueOf(information.getMonthlyIncome()));
+                 monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
                  nationalIDTextView.setText(information.getNationalID());
 
              }else
