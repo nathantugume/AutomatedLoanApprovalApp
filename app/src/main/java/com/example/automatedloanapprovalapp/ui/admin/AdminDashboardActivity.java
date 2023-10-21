@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.automatedloanapprovalapp.R;
+import com.example.automatedloanapprovalapp.ui.loanofficer.ManageLoanActivity;
+import com.example.automatedloanapprovalapp.ui.loanofficer.TransactionActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.navigation.NavigationView;
@@ -34,15 +36,25 @@ public class AdminDashboardActivity extends AppCompatActivity {
             }
         });
         CardView userCard = findViewById(R.id.users_card);
+        CardView transaction_card = findViewById(R.id.admin_transaction_card);
+        CardView loan_management_card = findViewById(R.id.loan_mgt);
 
 
-        userCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(AdminDashboardActivity.this, UserActivity.class);
-                startActivity(intent);
-            }
+        userCard.setOnClickListener(view -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, UserActivity.class);
+            startActivity(intent);
         });
+
+        transaction_card.setOnClickListener(view -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, TransactionActivity.class );
+            startActivity(intent);
+        });
+
+        loan_management_card.setOnClickListener(view -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageLoanActivity.class);
+            startActivity(intent);
+        });
+
 
     }
 

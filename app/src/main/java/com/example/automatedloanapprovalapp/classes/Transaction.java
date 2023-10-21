@@ -27,6 +27,11 @@ public class Transaction {
     private String status;
     private String userName;
     private String id;
+    private String approvedDate;
+    private String repaymentDate;
+    private String disbursedDate;
+    private String approvedBy;
+    private double repaidAmount;
 
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
 
@@ -115,76 +120,152 @@ public class Transaction {
         this.id = id;
     }
 
+    public String getApprovedDate() {
+        return approvedDate;
+    }
+
+    public void setApprovedDate(String approvedDate) {
+        this.approvedDate = approvedDate;
+    }
+
+    public String getRepaymentDate() {
+        return repaymentDate;
+    }
+
+    public void setRepaymentDate(String repaymentDate) {
+        this.repaymentDate = repaymentDate;
+    }
+
+    public String getDisbursedDate() {
+        return disbursedDate;
+    }
+
+    public void setDisbursedDate(String disbursedDate) {
+        this.disbursedDate = disbursedDate;
+    }
+
+    public String getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(String approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public double getRepaidAmount() {
+        return repaidAmount;
+    }
+
+    public void setRepaidAmount(double repaidAmount) {
+        this.repaidAmount = repaidAmount;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
     public void disburseFunds(Context context, String phone, int amount, String docId) {
-        try {
-            Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
-            FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
-            // Get the current date and time
-            Date currentDate = Calendar.getInstance().getTime();
 
-            // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            String formattedDate = dateFormat.format(currentDate);
-            Map<String, Object> updateData = new HashMap<>();
-            updateData.put("status", "disbursed");
-            updateData.put("disbursedDate", formattedDate);
-            firestoreCRUD.updateDocumentFields("transaction", docId, updateData, new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show();
-                }
-            });
+        MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask(phone, amount);
+        payoutTask.executePayout(new MobileMoneyPayoutTask.MobileMoneyPayoutListener() {
+            @Override
+            public void onPayoutSuccess() {
+                // Handle successful payout
+                // ...
+                try {
+                    Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
+                    FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
+                    // Get the current date and time
+                    Date currentDate = Calendar.getInstance().getTime();
 
-        } catch (Exception e) {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+                    // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    String formattedDate = dateFormat.format(currentDate);
+                    Map<String, Object> updateData = new HashMap<>();
+                    updateData.put("status", "disbursed");
+                    updateData.put("disbursedDate", formattedDate);
+                    firestoreCRUD.updateDocumentFields("transaction", docId, updateData, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }   
+            }
+
+            @Override
+            public void onPayoutFailure() {
+                // Handle payout failure
+                // ...
+                Toast.makeText(context, "payout failed!!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    
     }
 
     public void payback(Context context, int amount, String transactionId, String phoneNumber, int actualRepayment) {
-        int balance = actualRepayment - amount;
-        String status = "";
-        if (balance > 0) {
-            status = "partially_paid";
-        } else {
-            status = "fully_paid";
-        }
 
-        // Get the current date and time
-        Date currentDate = Calendar.getInstance().getTime();
-        // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String formattedDate = dateFormat.format(currentDate);
-        Map<String, Object> updatedData = new HashMap<>();
-        updatedData.put("status", status);
-        updatedData.put("paybackAmount", balance);
-        updatedData.put("repaidAmount", amount);
-        updatedData.put("repaymentDate", formattedDate);
-
-        firestoreCRUD.updateDocumentFields("transaction", transactionId, updatedData, new OnCompleteListener<Void>() {
+        MobileMoneyDepositTask depositTask = new MobileMoneyDepositTask();
+        depositTask.depositMoney(transactionId,amount,phoneNumber,actualRepayment,new MobileMoneyDepositTask.MobileMoneyDepositListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    updatedData.put("transactionId", transactionId);
-                    Toast.makeText(context, "Transaction completed successfully!!", Toast.LENGTH_SHORT).show();
-                    firestoreCRUD.createDocument("Repayment", updatedData, new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                Log.d("RepaymentData", "Data added successfully");
-                            } else {
-                                Log.d("RepaymentData", task.getException().getMessage());
-                            }
-
-                        }
-                    });
+            public void onDepositSuccess(String s) {
+                // Handle successful deposit
+                int balance = actualRepayment - amount;
+                String status = "";
+                if (balance > 0) {
+                    status = "partially_paid";
+                } else {
+                    status = "fully_paid";
                 }
 
+                // Get the current date and time
+                Date currentDate = Calendar.getInstance().getTime();
+                // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                String formattedDate = dateFormat.format(currentDate);
+                Map<String, Object> updatedData = new HashMap<>();
+                updatedData.put("status", status);
+                updatedData.put("paybackAmount", balance);
+                updatedData.put("repaidAmount", amount);
+                updatedData.put("repaymentDate", formattedDate);
+
+                firestoreCRUD.updateDocumentFields("transaction", transactionId, updatedData, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            updatedData.put("transactionId", transactionId);
+                            Toast.makeText(context, "Transaction completed successfully!!", Toast.LENGTH_SHORT).show();
+                            firestoreCRUD.createDocument("Repayment", updatedData, new OnCompleteListener<DocumentReference>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentReference> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d("RepaymentData", "Data added successfully");
+                                    } else {
+                                        Log.d("RepaymentData", task.getException().getMessage());
+                                    }
+
+                                }
+                            });
+                        }
+
+                    }
+                });
+                Log.d("Success", "deposit successful"+s);
+            }
+
+            @Override
+            public void onDepositFailure() {
+                // Handle failed deposit
+                Log.d("Fail", "deposit failed");
             }
         });
+
+
+
 
 
     }

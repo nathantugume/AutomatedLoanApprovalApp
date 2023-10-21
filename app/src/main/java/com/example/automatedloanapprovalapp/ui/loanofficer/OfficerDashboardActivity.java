@@ -19,7 +19,8 @@ public class OfficerDashboardActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
-    private  Intent intent;
+    private Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,22 +28,46 @@ public class OfficerDashboardActivity extends AppCompatActivity {
 
         topAppBar = findViewById(R.id.topAppBar);
         drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
+
 
         CardView manage_loan_card = findViewById(R.id.manage_loan);
         CardView manage_applications = findViewById(R.id.manage_applications);
+        CardView monitor_repayment_card = findViewById(R.id.monitor_repayment_card);
+        CardView transactionCard = findViewById(R.id.transactions_card);
+        CardView manage_account_card = findViewById(R.id.manage_account_card);
+
+        manage_account_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            newActivity(ManageAccountActivity.class);
+            }
+        });
+
+        transactionCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newActivity(TransactionActivity.class);
+            }
+        });
+
+        monitor_repayment_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newActivity(MonitorRepaymentActivity.class);
+            }
+        });
 
         manage_applications.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              newActivity(ManageApplicationActivity.class);
+                newActivity(ManageApplicationActivity.class);
             }
         });
 
         manage_loan_card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             newActivity(ManageLoanActivity.class);
+                newActivity(ManageLoanActivity.class);
             }
         });
 
@@ -55,13 +80,11 @@ public class OfficerDashboardActivity extends AppCompatActivity {
         });
 
 
-
-
-
     }
-    public void newActivity(Class<?> destinationActivity){
+
+    public void newActivity(Class<?> destinationActivity) {
         intent = new Intent(OfficerDashboardActivity.this, destinationActivity);
         startActivity(intent);
     }
 
-    }
+}

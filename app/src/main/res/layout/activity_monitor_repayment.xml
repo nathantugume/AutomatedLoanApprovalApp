@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.loanofficer.ManageApplicationActivity">
+    tools:context=".ui.loanofficer.MonitorRepaymentActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,13 +21,31 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/back_arrow"
-                app:title="Manage Applications"
+                app:title="Loan Repayment"
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
+
+<com.google.android.material.textfield.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    android:layout_margin="10dp"
+    app:boxStrokeColor="@color/green"
+    app:hintTextColor="@color/black"
+
+    >
+    <com.google.android.material.textfield.TextInputEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/monitor_search"
+        android:drawableEnd="@drawable/ic_search"
+        android:hint="Search by customer name"/>
+
+</com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -41,6 +59,8 @@
 
         </RelativeLayout>
     </LinearLayout>
+
+
 
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -60,7 +80,7 @@
             app:menu="@menu/bottom_menu"
             android:id="@+id/bottom_navigationView"
             app:labelVisibilityMode="labeled"
-            android:background="#00C6C6C6"
+            android:background="#0000"
             app:itemIconTint="@color/white"
             app:itemTextColor="@color/white"
             />

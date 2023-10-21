@@ -47,6 +47,7 @@ public class LoanTypeManager {
                     loanTypesCollection.document(documentId).set(loanType);
                     // Loan type added successfully
                     Toast.makeText(context, "Loan type added successfully!!", Toast.LENGTH_SHORT).show();
+
                 })
                 .addOnFailureListener(e -> {
                     // Failed to add loan type

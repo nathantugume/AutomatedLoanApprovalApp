@@ -21,7 +21,7 @@ public class PersonalInformation {
     private String jobTitle;
     private double monthlyIncome;
     private String nationalID;
-    private String nationalIdImage;
+    private String nationalIDImage;
     private String nationality;
     private int numberOfDependents;
     private boolean passwordResetRequired;
@@ -38,7 +38,7 @@ public class PersonalInformation {
     public PersonalInformation(String documentId, String additionalDocuments, String address, String businessLocation,
                                String businessName, double businessRevenue, String businessType, String dateOfBirth,
                                String email, String fullName, String gender, String jobTitle, double monthlyIncome,
-                               String nationalID, String nationalIdImage, String nationality, int numberOfDependents,
+                               String nationalID, String nationalIDImage, String nationality, int numberOfDependents,
                                boolean passwordResetRequired, String phoneNumber) {
         this.documentId = documentId;
         this.additionalDocuments = additionalDocuments;
@@ -54,7 +54,7 @@ public class PersonalInformation {
         this.jobTitle = jobTitle;
         this.monthlyIncome = monthlyIncome;
         this.nationalID = nationalID;
-        this.nationalIdImage = nationalIdImage;
+        this.nationalIDImage = nationalIDImage;
         this.nationality = nationality;
         this.numberOfDependents = numberOfDependents;
         this.passwordResetRequired = passwordResetRequired;
@@ -173,12 +173,12 @@ public class PersonalInformation {
         this.nationalID = nationalID;
     }
 
-    public String getNationalIdImage() {
-        return nationalIdImage;
+    public String getNationalIDImage() {
+        return nationalIDImage;
     }
 
-    public void setNationalIdImage(String nationalIdImage) {
-        this.nationalIdImage = nationalIdImage;
+    public void setNationalIDImage(String nationalIDImage) {
+        this.nationalIDImage = nationalIDImage;
     }
 
     public String getNationality() {

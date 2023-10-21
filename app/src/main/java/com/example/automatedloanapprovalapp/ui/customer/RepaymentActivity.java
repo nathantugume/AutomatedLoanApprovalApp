@@ -8,13 +8,13 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
+import com.example.automatedloanapprovalapp.classes.MobileMoneyDepositTask;
 import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -111,15 +111,16 @@ public class RepaymentActivity extends AppCompatActivity {
         });
 
 
-        payBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            int amount = Integer.parseInt(Objects.requireNonNull(payAmountEdt.getText()).toString());
-             Log.d("payAmount",String.valueOf(amount));
-              Transaction transaction = new Transaction();
-              transaction.payback(RepaymentActivity.this,amount,transactionId[0],phoneNumber[0],paybackAmount[0]);
+        payBtn.setOnClickListener(view -> {
+        int amount = Integer.parseInt(Objects.requireNonNull(payAmountEdt.getText()).toString());
+         Log.d("payAmount",String.valueOf(amount));
+          Transaction transaction = new Transaction();
+          transaction.payback(RepaymentActivity.this,amount,transactionId[0],phoneNumber[0],paybackAmount[0]);
+            // Execute the MobileMoneyDepositTask
+            Log.d("button pay","pressed");
 
-            }
+
+
         });
     }
 }

@@ -84,11 +84,60 @@
 
     </LinearLayout>
 
-<ImageView
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical">
+<LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:src="@drawable/ic_arrow_options"
-    android:layout_alignParentEnd="true"
-    android:layout_centerVertical="true"/>
+    android:layout_marginEnd="5dp"
+    >
+    <ImageView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/pencil"
+
+        />
+    <TextView
+        android:paddingStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="Edit"
+        android:textColor="@color/green"
+        android:id="@+id/loan_edit"
+        />
+</LinearLayout>
+        <LinearLayout
+            android:paddingTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/delete"
+                />
+            <TextView
+                android:id="@+id/delete_loan_type"
+                android:paddingStart="2dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/green"
+                android:text="Delete"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
 
 </RelativeLayout>

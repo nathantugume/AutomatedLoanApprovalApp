@@ -4,40 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".ui.admin.UserActivity">
-
-    <com.google.android.material.appbar.AppBarLayout
+    android:background="@color/background"
+    tools:context=".ui.loanofficer.ManageAccountActivity">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            app:menu="@menu/top_app_bar"
-            app:navigationIcon="@drawable/back_arrow"
-            app:title="Manage Users"
-            app:titleCentered="true"
-            android:background="#6AAE20"
-            app:layout_scrollFlags="enterAlways|snap"
+        android:orientation="vertical">
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="wrap_content"
+            android:id="@+id/appBarLayout"
+            >
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                app:menu="@menu/top_app_bar"
+                app:navigationIcon="@drawable/back_arrow"
+                app:title="Manage Users"
+                android:background="#6AAE20"
+                app:layout_scrollFlags="enterAlways|snap"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
 
-<RelativeLayout
-    android:layout_marginTop="70dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+        </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
- />
-</RelativeLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recyclerView"/>
+    </LinearLayout>
+
 
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -58,6 +58,8 @@
             android:id="@+id/bottom_navigationView"
             app:labelVisibilityMode="labeled"
             android:background="#0000"
+            app:itemIconTint="@color/white"
+            app:itemTextColor="@color/white"
             />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
@@ -66,10 +68,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
-        android:contentDescription="@string/add_user_floating_button"
+        android:contentDescription="@string/todo"
         android:src="@drawable/ic_add"
         app:layout_anchor="@id/bottom_app_bar"
-        android:id="@+id/fabAddUser"
+        android:id="@+id/fabAddLoan"
         app:maxImageSize="40dp" />
 
 

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+
 import com.example.automatedloanapprovalapp.ui.login.LogInActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -86,5 +88,25 @@ public class UserManager {
                         }
                     }
                 });
+    }
+
+    public void updateUserEmail(String newEmail, OnCompleteListener<Void> onCompleteListener) {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null) {
+            user.updateEmail(newEmail)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // Email update successful
+                                onCompleteListener.onComplete(task);
+                            } else {
+                                // Email update failed
+                                onCompleteListener.onComplete(task);
+                            }
+                        }
+                    });
+        }
     }
 }

@@ -161,24 +161,26 @@
                 />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/more_details"
-            android:layout_alignParentEnd="true"
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/more_details"-->
+<!--            android:layout_alignParentEnd="true"-->
 
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="More Details"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_options"
-                />
-        </LinearLayout>
+<!--            >-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/more_details_txt"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="More Details"-->
+<!--                android:textStyle="bold" />-->
+<!--            <ImageView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:src="@drawable/ic_arrow_options"-->
+<!--                />-->
+<!--        </LinearLayout>-->
 
     </RelativeLayout>
 

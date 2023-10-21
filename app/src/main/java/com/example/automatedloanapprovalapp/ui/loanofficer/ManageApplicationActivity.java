@@ -74,7 +74,7 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                         String status = document.getString("status");
                         String userId = document.getString("userId");
 
-                        // Inside the ManageApplicationActivity class
+                        //get user name
 
                         firestoreCRUD.readDocument("users", userId, new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -133,12 +133,15 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                                 DocumentSnapshot documentSnapshot = task.getResult();
                                 String customerID = documentSnapshot.getString("userId");
                                 int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
-                                firestoreCRUD.readDocument("users", customerID, new OnCompleteListener<DocumentSnapshot>() {
+
+                                Log.d("customerId",customerID+" ,"+String.valueOf(amount));
+                                firestoreCRUD.readDocument("customer_details", customerID, new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot snapshot = task.getResult();
                                             String phoneNumber = snapshot.getString("phoneNumber");
+                                            Log.d("manageApplication","phoneNumber:"+phoneNumber);
                                             Transaction transaction = new Transaction();
                                             transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId);
                                         }else

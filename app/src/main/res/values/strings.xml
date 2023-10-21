@@ -16,4 +16,9 @@
     <string name="maximum_loan_amount">Maximum Credit:</string>
     <string name="enter_loan_amount">Enter Loan Amount</string>
     <string name="title_activity_eligibility_check">EligibilityCheckActivity</string>
+    <string name="customer_name">Customer name</string>
+    <string name="transaction_id">Transaction Id</string>
+    <string name="no_content_found">No content found!!</string>
+    <string name="loan_type">Loan Type</string>
+    <string name="add_user_floating_button">add user floating button</string>
 </resources>

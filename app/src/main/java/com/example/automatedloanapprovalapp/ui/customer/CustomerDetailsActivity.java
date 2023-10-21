@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
 import com.example.automatedloanapprovalapp.classes.PersonalInformation;
+import com.example.automatedloanapprovalapp.classes.User;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +28,8 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_details);
 
+
+
         TextView fullNameTextView = findViewById(R.id.fullNameTextView);
         TextView emailTextView = findViewById(R.id.emailTextView);
         TextView phoneNumberTextView = findViewById(R.id.phoneNumberTextView);
@@ -37,40 +41,77 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         TextView monthlyIncomeTextView = findViewById(R.id.monthlyIncomeTextView);
         TextView nationalIDTextView = findViewById(R.id.nationalIDTextView);
         NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-
+        Intent intent = getIntent();
         FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
         UserManager userManager = new UserManager(CustomerDetailsActivity.this);
+        if (intent != null && intent.hasExtra("USER_DETAILS")) {
+            User user = intent.getParcelableExtra("USER_DETAILS");
+            firestoreCRUD.readDocument("customer_details", user.getUserId(), new OnCompleteListener<DocumentSnapshot>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()){
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
 
-        String uid = userManager.getCurrentUser().getUid();
+                        fullNameTextView.setText(information.getFullName());
+                        emailTextView.setText(information.getEmail());
+                        phoneNumberTextView.setText(information.getPhoneNumber());
+                        addressTextView.setText(information.getAddress());
+                        businessNameTextView.setText(information.getBusinessName());
+                        businessTypeTextView.setText(information.getBusinessType());
+                        genderTextView.setText(information.getGender());
+                        jobTitleTextView.setText(information.getJobTitle());
+                        monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
+                        nationalIDTextView.setText(information.getNationalID());
 
-     firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
-         @SuppressLint("SetTextI18n")
-         @Override
-         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-             if (task.isSuccessful()){
-                 DocumentSnapshot documentSnapshot = task.getResult();
-                 PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
-
-                 fullNameTextView.setText(information.getFullName());
-                 emailTextView.setText(information.getEmail());
-                 phoneNumberTextView.setText(information.getPhoneNumber());
-                 addressTextView.setText(information.getAddress());
-                 businessNameTextView.setText(information.getBusinessName());
-                 businessTypeTextView.setText(information.getBusinessType());
-                 genderTextView.setText(information.getGender());
-                 jobTitleTextView.setText(information.getJobTitle());
-                 monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
-                 nationalIDTextView.setText(information.getNationalID());
-
-             }else
-             {
-                 Log.d("CustomerDetails",task.getException().getMessage());
-             }
-
+                    }else
+                    {
+                        Log.d("CustomerDetails",task.getException().getMessage());
+                    }
 
 
 
-         }
-     });
+
+                }
+            });
+
+
+        }else {
+
+            String uid = userManager.getCurrentUser().getUid();
+
+            firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()){
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
+
+                        fullNameTextView.setText(information.getFullName());
+                        emailTextView.setText(information.getEmail());
+                        phoneNumberTextView.setText(information.getPhoneNumber());
+                        addressTextView.setText(information.getAddress());
+                        businessNameTextView.setText(information.getBusinessName());
+                        businessTypeTextView.setText(information.getBusinessType());
+                        genderTextView.setText(information.getGender());
+                        jobTitleTextView.setText(information.getJobTitle());
+                        monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
+                        nationalIDTextView.setText(information.getNationalID());
+
+                    }else
+                    {
+                        Log.d("CustomerDetails",task.getException().getMessage());
+                    }
+
+
+
+
+                }
+            });
+        }
+
+
     }
 }

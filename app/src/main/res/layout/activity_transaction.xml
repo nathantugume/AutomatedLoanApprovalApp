@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.loanofficer.ManageApplicationActivity">
+    tools:context=".ui.loanofficer.TransactionActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,8 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/back_arrow"
-                app:title="Manage Applications"
+                app:title="Transactions"
+                app:titleCentered="true"
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
@@ -29,18 +30,72 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_margin="5dp"
+            android:orientation="vertical"
             >
-            <androidx.recyclerview.widget.RecyclerView
+
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/customerNameInputLayout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:hint="@string/customer_name">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/autocomplete_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"
+                        android:textAllCaps="true"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/transactionIdsTxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/recyclerView"/>
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:hint="@string/transaction_id">
 
-        </RelativeLayout>
+                <AutoCompleteTextView
+                    android:id="@+id/autocomplete_text_tid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:textAllCaps="true"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_content"
+            android:text="@string/no_content_found"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:textAppearance="?attr/textAppearanceHeadline4"
+            android:visibility="gone"
+
+            />
+        <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/recyclerView"/>
     </LinearLayout>
+
+
 
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -60,7 +115,7 @@
             app:menu="@menu/bottom_menu"
             android:id="@+id/bottom_navigationView"
             app:labelVisibilityMode="labeled"
-            android:background="#00C6C6C6"
+            android:background="#0000"
             app:itemIconTint="@color/white"
             app:itemTextColor="@color/white"
             />
