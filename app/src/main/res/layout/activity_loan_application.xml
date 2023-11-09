@@ -20,7 +20,6 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/back_arrow"
                 app:title="Loan Application"
                 android:background="#6AAE20"
@@ -51,7 +50,7 @@
                         android:id="@+id/creditScoreTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100"
+                        android:text=""
                         android:textColor="@color/green"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -70,7 +69,7 @@
                         android:id="@+id/loanAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100"
+                        android:text=""
                         android:textColor="@color/green"
                         android:textSize="16sp"/>
 
@@ -95,42 +94,22 @@
 
         </RelativeLayout>
     </LinearLayout>
-
-
-    <com.google.android.material.bottomappbar.BottomAppBar
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottom_app_bar"
+        android:layout_marginStart="0dp"
+        app:menu="@menu/bottom_menu_normal"
+        android:id="@+id/bottom_navigationView"
+        app:labelVisibilityMode="labeled"
+        android:background="#6AAE20"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         android:layout_gravity="bottom"
-        android:backgroundTint="#6AAE20"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="50dp"
+        />
 
-        >
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:menu="@menu/bottom_menu"
 
-            android:id="@+id/bottom_navigationView"
-            app:labelVisibilityMode="labeled"
-            android:background="#0000"
-            app:itemIconTint="@color/white"
-            app:itemTextColor="@color/white"
-            />
 
-    </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:contentDescription="@string/todo"
-        android:src="@drawable/ic_add"
-        app:layout_anchor="@id/bottom_app_bar"
-        android:id="@+id/fabAddLoan"
-        app:maxImageSize="40dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

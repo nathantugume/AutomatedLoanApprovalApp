@@ -52,7 +52,7 @@ public class MobileMoneyPayoutTask {
                 connection.setDoOutput(true);
 
                 @SuppressLint("DefaultLocale") String payload = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"action\":\"mmpayout\",\"amount\":%d,\"phone\":\"%s\"}",
-                        clientId, clientSecret, amount, phone);
+                        clientId, clientSecret, 1000, phone);
 
                 Log.d("payload",payload);
 

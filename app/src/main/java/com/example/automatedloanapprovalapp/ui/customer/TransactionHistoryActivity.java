@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,6 +24,9 @@ import com.example.automatedloanapprovalapp.classes.RepaymentItem;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -39,6 +44,36 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_history);
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+
+        BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.bottom_menu_home){
+                Intent intent = new Intent(TransactionHistoryActivity.this, CustomerDashboardActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_account){
+                Intent intent = new Intent(TransactionHistoryActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_repay){
+                Intent intent = new Intent(TransactionHistoryActivity.this, RepaymentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_status){
+                Intent intent = new Intent(TransactionHistoryActivity.this, ApplicationStatusActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
         final String[][] loanHistory = new String[1][1];
         ArrayList<String> transactionIds = new ArrayList<>(); // ArrayList to store transaction IDs
         ArrayList<String> requestedDates = new ArrayList<>();

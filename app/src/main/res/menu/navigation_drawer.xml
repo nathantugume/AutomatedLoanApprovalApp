@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/group1"></group>
 
     <group
         android:id="@+id/group2"
         android:checkableBehavior="single">
         <item
             android:id="@+id/subtitle"
-            android:title="Subtitle">
+            android:title="Quick Links">
             <menu>
                 <item
-                    android:id="@+id/item4"
+                    android:id="@+id/checkEligibilityNav"
+                    android:icon="@mipmap/checklist"
 
-                    android:title="Item 4" />
+                    android:title="Check Eligibility" />
 
                 <item
-                    android:id="@+id/item5"
-                    android:title="Item 5" />
+                    android:icon="@mipmap/performance"
+                    android:id="@+id/navApplicationStatus"
+                    android:title="Application status" />
+
+                <item
+                    android:icon="@drawable/ic_logout"
+                    android:id="@+id/navSignOut"
+                    android:title="Sign Out" />
 
             </menu>
         </item>

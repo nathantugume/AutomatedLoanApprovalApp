@@ -21,4 +21,6 @@
     <string name="no_content_found">No content found!!</string>
     <string name="loan_type">Loan Type</string>
     <string name="add_user_floating_button">add user floating button</string>
+    <string name="notifications">notifications</string>
+    <string name="account">account</string>
 </resources>

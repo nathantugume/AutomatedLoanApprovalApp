@@ -23,7 +23,7 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:menu="@menu/top_app_bar"
+
                 app:navigationIcon="@drawable/back_arrow"
                 app:title="REPAYMENT"
                 app:titleCentered="true"
@@ -116,26 +116,18 @@
         </androidx.cardview.widget.CardView>
 
 
-
-
-
-
-        <com.google.android.material.bottomappbar.BottomAppBar
+        <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/green"
+            android:layout_marginStart="0dp"
+            app:menu="@menu/bottom_menu_normal"
+            android:id="@+id/bottom_navigationView"
+            app:labelVisibilityMode="labeled"
+            android:background="#6AAE20"
+            app:itemIconTint="@color/white"
+            app:itemTextColor="@color/white"
             android:layout_gravity="bottom"
-            >
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:menu="@menu/bottom_menu"
-                android:layout_gravity="bottom"
-                android:background="#0000"
-                app:labelVisibilityMode="labeled"
-                />
-
-        </com.google.android.material.bottomappbar.BottomAppBar>
+            />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

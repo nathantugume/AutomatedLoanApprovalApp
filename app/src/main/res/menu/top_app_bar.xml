@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/favorite"
-        android:icon="@drawable/ic_notifications"
-        android:title="notifications"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/notification2"
+        app:actionLayout="@layout/menu_item_notification"
+        android:title="@string/notifications"
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/search"
+        android:id="@+id/account"
         android:icon="@drawable/ic_account"
-        android:title="account"
-        app:showAsAction="ifRoom" />
+        android:title="@string/account"
+        app:showAsAction="always" />
+
 
 
 

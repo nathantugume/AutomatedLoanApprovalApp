@@ -26,13 +26,11 @@ import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
 import com.example.automatedloanapprovalapp.classes.LoanType;
 import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
-import com.example.automatedloanapprovalapp.ui.customer.LoanApplicationActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -54,6 +52,8 @@ public class ApplicationFormDialogFragment extends DialogFragment {
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private CreditScoreCalculator creditScoreCalculator = new CreditScoreCalculator();
     private double calculatedPayback;
+    private String uid = userManager.getCurrentUser().getUid();
+
     public ApplicationFormDialogFragment(LoanType selectedLoanType) {
         this.selectedLoanType = selectedLoanType;
     }
@@ -75,11 +75,10 @@ public class ApplicationFormDialogFragment extends DialogFragment {
         Button applyButton = view.findViewById(R.id.buttonApply);
 
 
-
         // Display loan details
         loanTypeTextView.setText(selectedLoanType.getType());
         interestRateTextView.setText(String.valueOf(selectedLoanType.getInterestRate()));
-        durationTextView.setText(String.valueOf(selectedLoanType.getDuration())+"months");
+        durationTextView.setText(selectedLoanType.getDuration() + "months");
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         float calculatedCreditAmount = sharedPreferences.getFloat("calculated_credit_amount", 0.0f);
         creditScoreCalculator.setCalculatedCreditAmount((int) calculatedCreditAmount);
@@ -88,7 +87,6 @@ public class ApplicationFormDialogFragment extends DialogFragment {
         interestRate = selectedLoanType.getInterestRate();
         term = Double.parseDouble(selectedLoanType.getDuration());
         double maxLoanAmount = creditScoreCalculator.getCalculatedCreditAmount();
-
 
         amountEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -102,15 +100,15 @@ public class ApplicationFormDialogFragment extends DialogFragment {
                 try {
                     String amountStr = charSequence.toString().trim();
                     double amount = Double.parseDouble(amountStr);
-                    if (amount <= maxLoanAmount){
-                        calculatedPayback =  creditScoreCalculator.calculatePaybackAmount(amount,interestRate,term);
+                    if (amount <= maxLoanAmount) {
+                        calculatedPayback = creditScoreCalculator.calculatePaybackAmount(amount, interestRate, term);
 
                         paybackAmount.setText(String.valueOf(calculatedPayback));
-                    }else {
+                    } else {
                         amountEditText.setError("Amount exceeds the loan limit");
                     }
-                }catch (Exception e){
-                    Log.d("textWatcherException",e.getMessage());
+                } catch (Exception e) {
+                    Log.d("textWatcherException", e.getMessage());
                 }
 
 
@@ -122,9 +120,30 @@ public class ApplicationFormDialogFragment extends DialogFragment {
             }
         });
 
+        hasLoan(uid, allFullyPaid -> {
+            if (allFullyPaid) {
+                // All statuses are "fully_paid"
+                Log.d("fully_paid", "true");
 
+            } else {
+                // Not all statuses are "fully_paid"
+                applyButton.setEnabled(false);
+                amountEditText.setError("you have a running loan ");
+                Snackbar snackbar = Snackbar.make(view, "You have a pending loan request.", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Ok", v -> {
+                            // Handle the action when the user clicks "Ok"
+
+                        });
+
+                snackbar.show();
+                snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+
+            }
+        });
 
         applyButton.setOnClickListener(v -> {
+
+
             String amountStr = amountEditText.getText().toString().trim();
             if (!amountStr.isEmpty()) {
                 double amount = Double.parseDouble(amountStr);
@@ -143,21 +162,18 @@ public class ApplicationFormDialogFragment extends DialogFragment {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 String formattedDate = dateFormat.format(currentDate);
 
-                String uid = userManager.getCurrentUser().getUid();
-                Transaction transaction = new Transaction(uid, selectedLoanType.getType(), amount, calculatedPayback, formattedDate, "pending");
-                firestoreCRUD.createDocument("transaction", transaction, new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        // Dismiss ProgressDialog
-                        progressDialog.dismiss();
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(view.getContext(), "Loan Request Submitted Successfully", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(view.getContext(), Objects.requireNonNull(task.getException()).toString(), Toast.LENGTH_SHORT).show();
-                        }
-                        dismiss();
+                Transaction transaction = new Transaction(uid, selectedLoanType.getType(), amount, calculatedPayback, formattedDate, "pending");
+                firestoreCRUD.createDocument("transaction", transaction, task -> {
+                    // Dismiss ProgressDialog
+                    progressDialog.dismiss();
+
+                    if (task.isSuccessful()) {
+                        Toast.makeText(view.getContext(), "Loan Request Submitted Successfully", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(view.getContext(), Objects.requireNonNull(task.getException()).toString(), Toast.LENGTH_SHORT).show();
                     }
+                    dismiss();
                 });
             } else {
                 amountEditText.setText("");
@@ -168,6 +184,54 @@ public class ApplicationFormDialogFragment extends DialogFragment {
 
         builder.setView(view);
         return builder.create();
+    }
+
+    private void hasLoan(String uid, LoanCheckCallback callback) {
+
+        ArrayList<String> statusList = new ArrayList<>();
+
+        firestoreCRUD.queryDocuments("transaction", "userId", uid, task -> {
+            if (task.isSuccessful()) {
+                Log.d("checkLoan", "task completed successfully");
+
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    if (document.exists()) {
+                        String status = document.getString("status");
+                        statusList.add(status);
+                    } else {
+                        statusList.add("fully_paid");
+                    }
+
+                }
+
+                boolean allFullyPaid = true;
+
+                for (String status : statusList) {
+                    if (status == null || !status.equals("fully_paid")) {
+                        allFullyPaid = false;
+                        break;
+                    }
+                }
+
+                if (allFullyPaid) {
+                    // All statuses are "fully_paid"
+                    Log.d("checkLoan", "All statuses are fully paid");
+                    callback.onLoanStatusCheck(true);
+                } else {
+                    // Not all statuses are "fully_paid"
+                    Log.d("checkLoan", "Not all statuses are fully paid");
+                    callback.onLoanStatusCheck(false);
+                }
+
+            } else {
+                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Define an interface for the callback
+    interface LoanCheckCallback {
+        void onLoanStatusCheck(boolean allFullyPaid);
     }
 
 

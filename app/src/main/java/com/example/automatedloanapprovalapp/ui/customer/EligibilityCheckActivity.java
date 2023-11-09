@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.icu.number.FormattedNumber;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,6 +21,9 @@ import com.example.automatedloanapprovalapp.classes.PersonalInformation;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.NumberFormat;
@@ -37,8 +41,37 @@ public class EligibilityCheckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eligibility_check);
         TextView loanLimit = findViewById(R.id.loanLimit);
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+        BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
 
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
+                if (item.getItemId() == R.id.bottom_menu_home){
+                    Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDashboardActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_account){
+                    Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDetailsActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_repay){
+                    Intent intent = new Intent(EligibilityCheckActivity.this, RepaymentActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_status){
+                    Intent intent = new Intent(EligibilityCheckActivity.this, ApplicationStatusActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         String uid = userManager.getCurrentUser().getUid();
 
@@ -47,7 +80,7 @@ public class EligibilityCheckActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(EligibilityCheckActivity.this, LoanApplicationActivity.class);
+                Intent intent = new Intent(EligibilityCheckActivity.this, EligibilityCheckActivity.class);
                 startActivity(intent);
             }
         });

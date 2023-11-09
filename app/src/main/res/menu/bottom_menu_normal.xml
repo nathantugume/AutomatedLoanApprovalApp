@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_menu_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home"/>
+
+
+    <item
+        android:id="@+id/bottom_menu_status"
+        android:title="Status"
+        android:icon="@mipmap/ic_status"
+
+    />
+    <item
+        android:id="@+id/bottom_menu_repay"
+        android:icon="@mipmap/money"
+        android:title="Pay Back"
+
+   />
+
+    <item
+        android:id="@+id/bottom_menu_account"
+        android:icon="@drawable/ic_account"
+        android:title="account"
+      />
+
+
+
+</menu>

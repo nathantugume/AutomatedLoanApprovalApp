@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,9 @@ import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -49,6 +54,39 @@ public class ApplicationStatusActivity extends AppCompatActivity {
         partialPaymentCard = findViewById(R.id.partialPaymentCard);
         completedBalanceCard = findViewById(R.id.paymentCompleteCard);
         lastPaidTxt = findViewById(R.id.lastPayDate);
+
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+
+        BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
+
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                if (item.getItemId() == R.id.bottom_menu_home){
+                    Intent intent = new Intent(ApplicationStatusActivity.this, CustomerDashboardActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_account){
+                    Intent intent = new Intent(ApplicationStatusActivity.this, CustomerDetailsActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_repay){
+                    Intent intent = new Intent(ApplicationStatusActivity.this, RepaymentActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                if (item.getItemId() == R.id.bottom_menu_status){
+                    Intent intent = new Intent(ApplicationStatusActivity.this, ApplicationStatusActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
         UserManager userManager = new UserManager(this);

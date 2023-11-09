@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.automatedloanapprovalapp.R;
@@ -16,6 +17,9 @@ import com.example.automatedloanapprovalapp.classes.User;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.NumberFormat;
@@ -28,6 +32,35 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_details);
 
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+
+        BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.bottom_menu_home){
+                Intent intent = new Intent(CustomerDetailsActivity.this, CustomerDashboardActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_account){
+                Intent intent = new Intent(CustomerDetailsActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_repay){
+                Intent intent = new Intent(CustomerDetailsActivity.this, RepaymentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_status){
+                Intent intent = new Intent(CustomerDetailsActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
 
 
         TextView fullNameTextView = findViewById(R.id.fullNameTextView);

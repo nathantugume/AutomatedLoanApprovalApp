@@ -28,9 +28,14 @@
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"
+
+                />
+
+
 
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <!-- Note: A RecyclerView can also be used -->
         <androidx.core.widget.NestedScrollView
