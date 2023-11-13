@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/subtitle"
+            android:title="Quick Links">
+            <menu>
+                <item
+                    android:id="@+id/nav_manage_loan"
+                    android:icon="@mipmap/loan"
+                    android:title="Manage Loan" />
+
+                <item
+                    android:icon="@mipmap/transaction_history"
+                    android:id="@+id/navTransactions"
+                    android:title="Transactions" />
+
+                <item
+                    android:icon="@mipmap/report"
+                    android:id="@+id/navReports"
+                    android:title="Reports" />
+                <item
+                    android:icon="@mipmap/usermgt"
+                    android:id="@+id/navManageAccount"
+                    android:title="Manage Account" />
+
+                <item
+                    android:icon="@drawable/ic_logout"
+                    android:id="@+id/navSignOut"
+                    android:title="Sign Out" />
+
+            </menu>
+        </item>
+    </group>
+</menu>

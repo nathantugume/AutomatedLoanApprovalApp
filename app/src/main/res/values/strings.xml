@@ -23,4 +23,5 @@
     <string name="add_user_floating_button">add user floating button</string>
     <string name="notifications">notifications</string>
     <string name="account">account</string>
+    <string name="officer_bottom_floating_button">Officer bottom floating button</string>
 </resources>

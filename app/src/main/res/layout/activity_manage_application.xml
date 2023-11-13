@@ -19,7 +19,6 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/back_arrow"
                 app:title="Manage Applications"
                 android:background="#6AAE20"
@@ -34,6 +33,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             >
+            <TextView
+                android:id="@+id/no_application_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No pending applications at the moment!!"
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                />
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,39 +50,16 @@
     </LinearLayout>
 
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bottom_app_bar"
-        android:layout_gravity="bottom"
-        android:backgroundTint="#6AAE20"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="50dp"
 
-        >
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:menu="@menu/bottom_menu"
-            android:id="@+id/bottom_navigationView"
-            app:labelVisibilityMode="labeled"
-            android:background="#00C6C6C6"
-            app:itemIconTint="@color/white"
-            app:itemTextColor="@color/white"
-            />
-
-    </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:contentDescription="@string/todo"
-        android:src="@drawable/ic_add"
-        app:layout_anchor="@id/bottom_app_bar"
-        android:id="@+id/fabAddLoan"
-        app:maxImageSize="40dp" />
-
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:id="@+id/bottom_nav"
+    app:menu="@menu/bottom_menu_officer_nm"
+    android:background="#6AAE20"
+    app:itemTextColor="@color/white"
+    app:labelVisibilityMode="labeled"
+    app:itemIconTint="@color/white"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -171,9 +171,8 @@ public class Transaction {
             @Override
             public void onPayoutSuccess() {
                 // Handle successful payout
-                // ...
                 try {
-                    Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
                     FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
                     // Get the current date and time
                     Date currentDate = Calendar.getInstance().getTime();
@@ -192,15 +191,16 @@ public class Transaction {
                     });
 
                 } catch (Exception e) {
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("Payout",e.getMessage());
+
                 }   
             }
 
             @Override
             public void onPayoutFailure() {
                 // Handle payout failure
-                // ...
-                Toast.makeText(context, "payout failed!!", Toast.LENGTH_SHORT).show();
+
+            Log.d("Failed", "payout failed");
             }
         });
 

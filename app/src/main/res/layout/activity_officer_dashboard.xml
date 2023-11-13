@@ -25,7 +25,7 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/ic_menu"
-                app:title="Dashboard"
+                app:title="Officer Dashboard"
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
@@ -165,6 +165,7 @@
                         android:layout_margin="10dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="5dp"
+                        android:id="@+id/reportCard"
                         >
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -280,7 +281,7 @@
         android:layout_width="217dp"
         android:layout_height="match_parent"
         app:headerLayout="@layout/officer_header_navigation_drawer"
-        app:menu="@menu/navigation_drawer"
+        app:menu="@menu/navigation_drawer_officer"
         android:layout_marginTop="62dp"
         android:layout_gravity="start"
         />

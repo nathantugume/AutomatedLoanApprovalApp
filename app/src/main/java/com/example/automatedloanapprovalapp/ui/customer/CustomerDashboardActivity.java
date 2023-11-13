@@ -125,7 +125,8 @@ public class CustomerDashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(CustomerDashboardActivity.this, LoanApplicationActivity.class);
             startActivity(intent);
         });
-        eligibility_checkCard.setOnClickListener(view -> {            Intent intent = new Intent(CustomerDashboardActivity.this, EligibilityCheckActivity.class);
+        eligibility_checkCard.setOnClickListener(view -> {
+            Intent intent = new Intent(CustomerDashboardActivity.this, EligibilityCheckActivity.class);
             startActivity(intent);
         });
 

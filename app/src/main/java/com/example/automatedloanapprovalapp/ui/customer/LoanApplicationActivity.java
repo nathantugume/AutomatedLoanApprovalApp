@@ -66,32 +66,29 @@ public class LoanApplicationActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
 
-                if (item.getItemId() == R.id.bottom_menu_home){
-                    Intent intent = new Intent(LoanApplicationActivity.this, CustomerDashboardActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_account){
-                    Intent intent = new Intent(LoanApplicationActivity.this, CustomerDetailsActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_repay){
-                    Intent intent = new Intent(LoanApplicationActivity.this, RepaymentActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_status){
-                    Intent intent = new Intent(LoanApplicationActivity.this, ApplicationStatusActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
+            if (item.getItemId() == R.id.bottom_menu_home){
+                Intent intent = new Intent(LoanApplicationActivity.this, CustomerDashboardActivity.class);
+                startActivity(intent);
+                return true;
             }
+            if (item.getItemId() == R.id.bottom_menu_account){
+                Intent intent = new Intent(LoanApplicationActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_repay){
+                Intent intent = new Intent(LoanApplicationActivity.this, RepaymentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_status){
+                Intent intent = new Intent(LoanApplicationActivity.this, ApplicationStatusActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
 
         creditScoreTxt = findViewById(R.id.creditScoreTxt);

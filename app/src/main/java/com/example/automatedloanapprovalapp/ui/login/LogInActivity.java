@@ -53,85 +53,71 @@ public class LogInActivity extends AppCompatActivity {
         resetPasswordText = findViewById(R.id.resetPasswordText);
         createAccountText = findViewById(R.id.createAccountText);
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Validate email and password here
-                String email = etEmail.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
-
-                userManager.signInUser(email, password, new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()){
-                            String uid = null;
-                            if (!userManager.getCurrentUser().getUid().isEmpty()){
-                                uid  = userManager.getCurrentUser().getUid();
-                            }else {
-                                Toast.makeText(LogInActivity.this, "login failed please try again!!", Toast.LENGTH_SHORT).show();
-                                userManager.signOutUser();
-                            }
-                            firestoreCRUD.readDocument("users", uid, new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    DocumentSnapshot documentSnapshot = task.getResult();
-                                    String role = documentSnapshot.getString("role");
-                                    Log.d("role","role: "+role);
-
-                                switch (role){
-                                    case "default":
-                                    case  "admin":
-                                        Intent intent = new Intent(LogInActivity.this, AdminDashboardActivity.class);
-                                        startActivity(intent);
-                                        break;
-                                    case "loan_manager":
-                                         intent = new Intent(LogInActivity.this, OfficerDashboardActivity.class);
-                                        startActivity(intent);
-                                        break;
-                                    case "customer":
-                                        intent = new Intent(LogInActivity.this, CustomerDashboardActivity.class);
-                                        startActivity(intent);
-                                        break;
-                                    default:
-                                        Toast.makeText(LogInActivity.this, "Invalid user role please contact Admin", Toast.LENGTH_LONG).show();
-
-                                }
-                                }
-                            });
-                        }
-                        else {
-                            task.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(LogInActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
+        btnSignIn.setOnClickListener(view -> {
+            // Validate email and password here
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
 
-
+            userManager.signInUser(email, password, task -> {
+                if (task.isSuccessful()){
+                    String uid = null;
+                    if (!userManager.getCurrentUser().getUid().isEmpty()){
+                        uid  = userManager.getCurrentUser().getUid();
+                    }else {
+                        Toast.makeText(LogInActivity.this, "login failed please try again!!", Toast.LENGTH_SHORT).show();
+                        userManager.signOutUser();
                     }
-                });
-            }
+                    firestoreCRUD.readDocument("users", uid, task1 -> {
+                        DocumentSnapshot documentSnapshot = task1.getResult();
+                        String role = documentSnapshot.getString("role");
+                        Log.d("role","role: "+role);
+
+                        try {
+                            switch (role){
+                                case "default":
+                                case  "admin":
+                                    Intent intent = new Intent(LogInActivity.this, AdminDashboardActivity.class);
+                                    startActivity(intent);
+                                    break;
+                                case "loan_manager":
+                                    intent = new Intent(LogInActivity.this, OfficerDashboardActivity.class);
+                                    startActivity(intent);
+                                    break;
+                                case "customer":
+                                    intent = new Intent(LogInActivity.this, CustomerDashboardActivity.class);
+                                    startActivity(intent);
+                                    break;
+                                default:
+                                    Toast.makeText(LogInActivity.this, "Invalid user role please contact Admin", Toast.LENGTH_LONG).show();
+
+                            }
+                        }catch (Exception e){
+                            Log.d("error",e.getMessage());
+                        }
+
+                    });
+                }
+                else {
+                    task.addOnFailureListener(e -> Toast.makeText(LogInActivity.this, e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+
+
+
+            });
         });
 
-        resetPasswordText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LogInActivity.this, ForgotPasswordActivity.class);
-                startActivity(intent);
-            }
+        resetPasswordText.setOnClickListener(view -> {
+            Intent intent = new Intent(LogInActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
-        createAccountText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Implement the logic for creating a new account here
+        createAccountText.setOnClickListener(view -> {
+            // Implement the logic for creating a new account here
 
-                 Intent registrationIntent = new Intent(LogInActivity.this, PersonalInfoActivity.class);
-                 startActivity(registrationIntent);
+             Intent registrationIntent = new Intent(LogInActivity.this, PersonalInfoActivity.class);
+             startActivity(registrationIntent);
 
-            }
         });
 
     }

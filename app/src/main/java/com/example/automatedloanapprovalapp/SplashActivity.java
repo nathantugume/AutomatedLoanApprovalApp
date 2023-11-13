@@ -2,6 +2,7 @@ package com.example.automatedloanapprovalapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,14 +23,16 @@ public class SplashActivity extends AppCompatActivity {
     private ImageView imageView;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
-    UserManager userManager = new UserManager(this);
 
+
+
+// ...
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        userManager.signOutUser();
+
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
@@ -39,22 +42,16 @@ public class SplashActivity extends AppCompatActivity {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         imageView.startAnimation(animation);
 
-        // Delay the transition to the main activity
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Check for default user
-                checkDefaultUser();
+        // Show progress dialog
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading ...");
+        progressDialog.show();
 
-                // Start the main activity
-                Intent intent = new Intent(SplashActivity.this, LogInActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }, SPLASH_DELAY);
+        // Check for default user before transitioning
+        checkDefaultUser(progressDialog);
     }
 
-    private void checkDefaultUser() {
+    private void checkDefaultUser(ProgressDialog progressDialog) {
         // Check if a user with role "default" exists in Firestore users collection
         Query docRef = firestore.collection("users").whereEqualTo("role","default");
         docRef.get().addOnCompleteListener(task -> {
@@ -65,13 +62,44 @@ public class SplashActivity extends AppCompatActivity {
                             .addOnCompleteListener(this, task1 -> {
                                 if (task1.isSuccessful()) {
                                     // Add user with role "default" to Firestore users collection
-                                  String uid =  mAuth.getCurrentUser().getUid();
+                                    String uid = mAuth.getCurrentUser().getUid();
                                     User defaultUser = new User("admin","admin@loanapp.com","admin@1234", "default");
-                                    firestore.collection("users").document(uid).set(defaultUser);
+                                    firestore.collection("users").document(uid).set(defaultUser)
+                                            .addOnCompleteListener(task2 -> {
+                                                // Dismiss progress dialog
+                                                progressDialog.dismiss();
+
+                                                // Start the main activity after sign-out
+                                                signOutAndStartMainActivity();
+                                            });
                                 }
                             });
+                } else {
+                    // User with role "default" already exists, proceed to sign-out
+                    progressDialog.dismiss();
+                    signOutAndStartMainActivity();
                 }
             }
         });
     }
+
+    private void signOutAndStartMainActivity() {
+        // Show progress dialog
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Signing out...");
+        progressDialog.show();
+
+        // Sign out the user
+        mAuth.signOut();
+
+        // Start the main activity after sign-out
+        new Handler().postDelayed(() -> {
+            progressDialog.dismiss(); // Dismiss progress dialog
+            Intent intent = new Intent(SplashActivity.this, LogInActivity.class);
+            startActivity(intent);
+            finish();
+        }, SPLASH_DELAY);
+    }
+
+
 }

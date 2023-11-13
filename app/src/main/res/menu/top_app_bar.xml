@@ -14,7 +14,4 @@
         android:title="@string/account"
         app:showAsAction="always" />
 
-
-
-
 </menu>

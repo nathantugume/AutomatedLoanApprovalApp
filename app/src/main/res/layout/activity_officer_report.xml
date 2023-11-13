@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.loanofficer.MonitorRepaymentActivity">
+    tools:context=".ui.loanofficer.OfficerReportActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
                 android:id="@+id/topAppBar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 app:navigationIcon="@drawable/back_arrow"
-                app:title="Loan Repayment"
+                app:title="Reports"
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
@@ -28,36 +28,18 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-<com.google.android.material.textfield.TextInputLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-    android:layout_margin="10dp"
-    app:boxStrokeColor="@color/green"
-    app:hintTextColor="@color/black"
 
-    >
-    <com.google.android.material.textfield.TextInputEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/monitor_search"
-        android:drawableEnd="@drawable/ic_search"
-        android:hint="Search by customer name"/>
-
-</com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             >
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/recyclerView"/>
+
 
         </RelativeLayout>
     </LinearLayout>
+
 
 
 <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -66,11 +48,11 @@
     app:menu="@menu/bottom_menu_officer_nm"
     android:layout_gravity="bottom"
     android:background="@color/green"
-    app:itemIconTint="@color/white"
     app:itemTextColor="@color/white"
     app:labelVisibilityMode="labeled"
-    android:id="@+id/bottom_navigation"/>
-
+    app:itemIconTint="@color/white"
+    android:id="@+id/bottom_navigation"
+    />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

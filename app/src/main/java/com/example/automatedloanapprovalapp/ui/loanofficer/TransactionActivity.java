@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,6 +27,9 @@ import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.ui.customer.TransactionHistoryActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,6 +47,38 @@ public class TransactionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction);
+
+        //TopAppBar
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+
+        //BottomNavigation
+
+        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation);
+        navigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.bottom_manager_home){
+                startActivity(new Intent(TransactionActivity.this, OfficerDashboardActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_reports){
+                startActivity(new Intent(TransactionActivity.this, OfficerReportActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_mng_loan){
+                startActivity(new Intent(TransactionActivity.this,ManageLoanActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_transactions){
+                startActivity(new Intent(TransactionActivity.this, TransactionActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_accounts){
+                startActivity(new Intent(TransactionActivity.this, TransactionActivity.class));
+                return true;
+            }
+
+            return false;
+        });
 
         final String[][] customers = new String[1][1];
         final String[][] ids = new String[1][1];
@@ -64,69 +101,63 @@ public class TransactionActivity extends AppCompatActivity {
 
         AutoCompleteTextView autoCompleteTextView = findViewById(R.id.autocomplete_text);
 
-        firestoreCRUD.getAllDocuments("customer_details", new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                        PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
-                        String docId = documentSnapshot.getId();
+        firestoreCRUD.getAllDocuments("customer_details", task -> {
+            if (task.isSuccessful()) {
+                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                    PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
+                    String docId = documentSnapshot.getId();
 
-                        customerNames.add(information.getFullName());
-                        customerIds.add(docId);
-
-                    }
-                    customers[0] = customerNames.toArray(new String[0]);
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(TransactionActivity.this, R.layout.menu_item, customers[0]);
-                    autoCompleteTextView.setAdapter(adapter);
-
+                    customerNames.add(information.getFullName());
+                    customerIds.add(docId);
 
                 }
+                customers[0] = customerNames.toArray(new String[0]);
+
+                ArrayAdapter<String> adapter12 = new ArrayAdapter<>(TransactionActivity.this, R.layout.menu_item, customers[0]);
+                autoCompleteTextView.setAdapter(adapter12);
+
+
             }
         });
 
 
-        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String selectedName = adapterView.getItemAtPosition(i).toString();
+        autoCompleteTextView.setOnItemClickListener((adapterView, view, i, l) -> {
+            String selectedName = adapterView.getItemAtPosition(i).toString();
 
-                int pos = customerNames.indexOf(selectedName);
-                String uid = customerIds.get(pos);
-                idsInputLayout.getEditText().setText("");
-                transactionIds.clear();
-                repaymentItems.clear();
-                adapter.notifyDataSetChanged();
-                firestoreCRUD.queryDocuments("transaction", "userId", uid, new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+            int pos = customerNames.indexOf(selectedName);
+            String uid = customerIds.get(pos);
+            idsInputLayout.getEditText().setText("");
+            transactionIds.clear();
+            repaymentItems.clear();
+            adapter.notifyDataSetChanged();
+            firestoreCRUD.queryDocuments("transaction", "userId", uid, new OnCompleteListener<QuerySnapshot>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
 
-                            for (DocumentSnapshot snapshot : task.getResult()) {
-                                Transaction transaction = snapshot.toObject(Transaction.class);
-                                if (transaction != null) {
-                                    if (transaction.getUserId().equals(uid)) {
-                                        transactionIds.add(snapshot.getId());
-                                    }
-                                } else {
-                                    noContent.setVisibility(View.VISIBLE);
-                                    idsInputLayout.getEditText().setText("no transaction found!!");
+                        for (DocumentSnapshot snapshot : task.getResult()) {
+                            Transaction transaction = snapshot.toObject(Transaction.class);
+                            if (transaction != null) {
+                                if (transaction.getUserId().equals(uid)) {
+                                    transactionIds.add(snapshot.getId());
                                 }
-
+                            } else {
+                                noContent.setVisibility(View.VISIBLE);
+                                idsInputLayout.getEditText().setText("no transaction found!!");
                             }
-                            ids[0] = transactionIds.toArray(new String[0]);
 
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(TransactionActivity.this, R.layout.menu_item, ids[0]);
-                            autoCompleteTid.setAdapter(adapter);
-
-                        } else {
-                            Log.d("transactionIDs", task.getException().getMessage());
                         }
+                        ids[0] = transactionIds.toArray(new String[0]);
+
+                        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(TransactionActivity.this, R.layout.menu_item, ids[0]);
+                        autoCompleteTid.setAdapter(adapter1);
+
+                    } else {
+                        Log.d("transactionIDs", task.getException().getMessage());
                     }
-                });
-            }
+                }
+            });
         });
 
         autoCompleteTid.setOnItemClickListener(new AdapterView.OnItemClickListener() {

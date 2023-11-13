@@ -19,9 +19,9 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/back_arrow"
                 app:title="Manage Users"
+                app:titleCentered="true"
                 android:background="#6AAE20"
                 app:layout_scrollFlags="enterAlways|snap"
                 android:layout_width="match_parent"
@@ -40,39 +40,18 @@
 
 
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bottom_app_bar"
-        android:layout_gravity="bottom"
-        android:backgroundTint="#6AAE20"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="50dp"
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:menu="@menu/bottom_menu_officer_nm"
+    android:layout_gravity="bottom"
+    android:background="@color/green"
+    app:itemTextColor="@color/white"
+    app:labelVisibilityMode="labeled"
+    app:itemIconTint="@color/white"
+    android:id="@+id/bottom_navigation"/>
 
-        >
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:menu="@menu/bottom_menu"
-            android:id="@+id/bottom_navigationView"
-            app:labelVisibilityMode="labeled"
-            android:background="#0000"
-            app:itemIconTint="@color/white"
-            app:itemTextColor="@color/white"
-            />
-
-    </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:contentDescription="@string/todo"
-        android:src="@drawable/ic_add"
-        app:layout_anchor="@id/bottom_app_bar"
-        android:id="@+id/fabAddLoan"
-        app:maxImageSize="40dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

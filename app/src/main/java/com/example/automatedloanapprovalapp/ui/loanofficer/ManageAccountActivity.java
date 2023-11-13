@@ -11,6 +11,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.automatedloanapprovalapp.R;
@@ -21,6 +23,9 @@ import com.example.automatedloanapprovalapp.fragments.EditUserDialogFragment;
 import com.example.automatedloanapprovalapp.ui.customer.CustomerDetailsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -38,8 +43,44 @@ public class ManageAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_account);
 
+        //ToolBar
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+
+        // BottomNavigation
+        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation);
+
+        navigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.bottom_manager_home){
+                startActivity(new Intent(ManageAccountActivity.this, OfficerDashboardActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_reports){
+                startActivity(new Intent(ManageAccountActivity.this, OfficerReportActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_mng_loan){
+                startActivity(new Intent(ManageAccountActivity.this,ManageLoanActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_transactions){
+                startActivity(new Intent(ManageAccountActivity.this, TransactionActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_accounts){
+                startActivity(new Intent(ManageAccountActivity.this, ManageAccountActivity.class));
+                return true;
+            }
+
+            return false;
+        });
+
+
+
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
 
         // Assume userList contains your User objects
         List<User> userList = new ArrayList<>();
@@ -48,6 +89,30 @@ public class ManageAccountActivity extends AppCompatActivity {
         adapter = new UserAdapter(userList);
         recyclerView.setAdapter(adapter);
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    // Scrolling up, hide the bottom navigation
+                    hideBottomNavigation();
+                } else if (dy < 0) {
+                    // Scrolling down, show the bottom navigation
+                    showBottomNavigation();
+                }
+            }
+
+            private void showBottomNavigation() {
+                if (navigationView.getVisibility() != View.VISIBLE) {
+                    navigationView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            private void hideBottomNavigation() {
+                if (navigationView.getVisibility() == View.VISIBLE) {
+                    navigationView.setVisibility(View.GONE);
+                }
+            }
+        });
         firestoreCRUD.queryDocuments("users", "role", "customer", new OnCompleteListener<QuerySnapshot>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -65,17 +130,14 @@ public class ManageAccountActivity extends AppCompatActivity {
             }
         });
 
-        adapter.setOnEditClickListener(new UserAdapter.OnEditClickListener() {
-            @Override
-            public void onEditClick(int position) {
-                // Implement edit functionality here
-                User user = userList.get(position);
+        adapter.setOnEditClickListener(position -> {
+            // Implement edit functionality here
+            User user = userList.get(position);
 
-                // Show edit dialog or navigate to edit activity
+            // Show edit dialog or navigate to edit activity
 
-                EditUserDialogFragment dialogFragment = new EditUserDialogFragment(user);
-                dialogFragment.show(getSupportFragmentManager(), "EditUserDialogFragment");
-            }
+            EditUserDialogFragment dialogFragment = new EditUserDialogFragment(user);
+            dialogFragment.show(getSupportFragmentManager(), "EditUserDialogFragment");
         });
 
         adapter.setOnDeleteClickListener(position -> {
@@ -113,16 +175,13 @@ public class ManageAccountActivity extends AppCompatActivity {
 
         });
 
-        adapter.setOnDetailsClickListener(new UserAdapter.OnDetailsClickListener() {
-            @Override
-            public void onDetailsClick(int position) {
-                // Implement more details functionality here
-                User user = userList.get(position);
-                // Show more details activity or dialog
-                Intent intent = new Intent(ManageAccountActivity.this, CustomerDetailsActivity.class);
-                intent.putExtra("USER_DETAILS", user);
-                startActivity(intent);
-            }
+        adapter.setOnDetailsClickListener(position -> {
+            // Implement more details functionality here
+            User user = userList.get(position);
+            // Show more details activity or dialog
+            Intent intent = new Intent(ManageAccountActivity.this, CustomerDetailsActivity.class);
+            intent.putExtra("USER_DETAILS", user);
+            startActivity(intent);
         });
 
     }

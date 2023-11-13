@@ -1,36 +1,33 @@
 package com.example.automatedloanapprovalapp.ui.loanofficer;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.adapters.TransactionAdapter;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
-import com.example.automatedloanapprovalapp.classes.MobileMoneyPayoutTask;
 import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,64 +47,129 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_application);
 
+        TextView noApplicationTxt = findViewById(R.id.no_application_textView);
+
         // Initialize RecyclerView and data
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         transactions = new ArrayList<>(); // Initialize your transactions list here
 
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
+        MaterialToolbar materialToolbar = findViewById(R.id.topAppBar);
+
+        materialToolbar.setNavigationOnClickListener(view -> onBackPressed());
+
         // Create and set the adapter
         adapter = new TransactionAdapter(transactions,this);
         recyclerView.setAdapter(adapter);
 
-        firestoreCRUD.getAllDocuments("transaction", new OnCompleteListener<QuerySnapshot>() {
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    transactions.clear(); // Clear the list before adding new data
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        // Parse the document data and create Transaction objects
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    // Scrolling up, hide the bottom navigation
+                    hideBottomNavigation();
+                } else if (dy < 0) {
+                    // Scrolling down, show the bottom navigation
+                    showBottomNavigation();
+                }
+            }
+
+            private void showBottomNavigation() {
+                if (bottomNavigationView.getVisibility() != View.VISIBLE) {
+                    bottomNavigationView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            private void hideBottomNavigation() {
+                if (bottomNavigationView.getVisibility() == View.VISIBLE) {
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.bottom_manager_home){
+                Intent intent = new Intent(ManageApplicationActivity.this, OfficerDashboardActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_reports){
+                startActivity(new Intent(ManageApplicationActivity.this, OfficerReportActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_mng_loan){
+                startActivity(new Intent(ManageApplicationActivity.this, ManageLoanActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_transactions){
+                startActivity(new Intent(ManageApplicationActivity.this, TransactionActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_accounts){
+                startActivity(new Intent(ManageApplicationActivity.this,ManageAccountActivity.class));
+                return true;
+            }
+            return false;
+        });
+
+
+        // Create a ProgressDialog
+        ProgressDialog progressDialog = new ProgressDialog(ManageApplicationActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+
+        firestoreCRUD.getAllDocuments("transaction", task -> {
+            progressDialog.dismiss(); // Dismiss the progress dialog when the data is loaded
+
+            if (task.isSuccessful()) {
+                transactions.clear(); // Clear the list before adding new data
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String status = document.getString("status");
+                    if (status.equals("pending")) {
                         String documentId = document.getId();
                         String dateRequested = document.getString("dateRequested");
                         String loanType = document.getString("loanType");
                         int paybackAmount = document.getLong("paybackAmount").intValue();
                         int requestedAmount = document.getLong("requestedAmount").intValue();
-                        String status = document.getString("status");
                         String userId = document.getString("userId");
 
                         //get user name
-
-                        firestoreCRUD.readDocument("users", userId, new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                DocumentSnapshot documentSnapshot = task.getResult();
-
-                                userName = documentSnapshot.getString("username");
-                                Log.d("userName",userName);
-                                Transaction transaction = new Transaction(documentId,userId,loanType,requestedAmount,paybackAmount,dateRequested,status,userName);
-                                transactions.add(transaction);
-                                adapter.notifyDataSetChanged();
-                            }
+                        firestoreCRUD.readDocument("users", userId, task1 -> {
+                            DocumentSnapshot documentSnapshot = task1.getResult();
+                            userName = documentSnapshot.getString("username");
+                            Transaction transaction = new Transaction(documentId, userId, loanType, requestedAmount, paybackAmount, dateRequested, status, userName);
+                            transactions.add(transaction);
+                            adapter.notifyDataSetChanged();
+                            noApplicationTxt.setVisibility(View.GONE);
                         });
 
-
-
+                    } else {
+                        noApplicationTxt.setVisibility(View.VISIBLE);
                     }
-                 // Notify the adapter that data has changed
-                } else {
-                    // Handle errors
-                    Toast.makeText(ManageApplicationActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                // Handle errors
+                Toast.makeText(ManageApplicationActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+
     }
+
+
 
 
     @Override
     public void onTransactionClick(String transactionId) {
         UserManager userManager = new UserManager(this);
         String uid = userManager.getCurrentUser().getUid();
-        // Get the current date and time
 
+        // Get the current date and time
         Date currentDate = Calendar.getInstance().getTime();
 
         // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
@@ -118,55 +180,40 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
         updateData.put("approvedBy", uid);
         updateData.put("approvedDate",formattedDate);
 
-
-
-        firestoreCRUD.updateDocumentFields("transaction", transactionId,updateData, new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    // Call the disburseFunds function after updating the status
+        firestoreCRUD.updateDocumentFields("transaction", transactionId,updateData, task -> {
+            if (task.isSuccessful()){
+                // Call the disburseFunds function after updating the status
 //                    disburseFunds(transactionId);
-                    firestoreCRUD.readDocument("transaction", transactionId, new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-                                DocumentSnapshot documentSnapshot = task.getResult();
-                                String customerID = documentSnapshot.getString("userId");
-                                int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
+                firestoreCRUD.readDocument("transaction", transactionId, task12 -> {
+                    if (task12.isSuccessful()){
+                        DocumentSnapshot documentSnapshot = task12.getResult();
+                        String customerID = documentSnapshot.getString("userId");
+                        int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
 
-                                Log.d("customerId",customerID+" ,"+String.valueOf(amount));
-                                firestoreCRUD.readDocument("customer_details", customerID, new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()){
-                                            DocumentSnapshot snapshot = task.getResult();
-                                            String phoneNumber = snapshot.getString("phoneNumber");
-                                            Log.d("manageApplication","phoneNumber:"+phoneNumber);
-                                            Transaction transaction = new Transaction();
-                                            transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId);
-                                        }else
-                                        {
-                                            Toast.makeText(ManageApplicationActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });
-
-
+                        Log.d("customerId",customerID+" ,"+String.valueOf(amount));
+                        firestoreCRUD.readDocument("customer_details", customerID, task1 -> {
+                            if (task1.isSuccessful()){
+                                DocumentSnapshot snapshot = task1.getResult();
+                                String phoneNumber = snapshot.getString("phoneNumber");
+                                Log.d("manageApplication","phoneNumber:"+phoneNumber);
+                                Transaction transaction = new Transaction();
+                                transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId);
+                            }else
+                            {
+                                Toast.makeText(ManageApplicationActivity.this, task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        }
-                    });
+                        });
 
 
-                    Toast.makeText(ManageApplicationActivity.this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                }else {
-                    Toast.makeText(ManageApplicationActivity.this, "Failed to approve loan, please try again!!", Toast.LENGTH_SHORT).show();
-                }
+
+                Toast.makeText(ManageApplicationActivity.this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
+
+            }else {
+                Toast.makeText(ManageApplicationActivity.this, "Failed to approve loan, please try again!!", Toast.LENGTH_SHORT).show();
             }
-
-
-
-
         });
       //  Toast.makeText(this, "clicked "+transactionId, Toast.LENGTH_SHORT).show();
     }

@@ -11,8 +11,8 @@ import java.net.URL;
 public class MobileMoneyDepositTask {
 
     private String apiUrl = "https://www.easypay.co.ug/api/";
-    private String clientId = "cbdc1aeeeaa4667f";
-    private String clientSecret = "0a66d21d6b7cb635";
+    private String clientId = "720bd5a4d9e94aff";
+    private String clientSecret = "4e24c1bc3ef29542";
     private String phone ;
     private int amount ;
     private  StringBuilder response;
@@ -34,7 +34,7 @@ public class MobileMoneyDepositTask {
             try {
                 // Create the JSON payload
                 @SuppressLint("DefaultLocale") String payload = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"action\":\"mmdeposit\",\"amount\":%d,\"phone\":\"%s\",\"currency\":\"UGX\",\"reference\":%d,\"reason\":\"%s\"}",
-                        clientId, clientSecret, finalAmount, phone, reference, reason);
+                        clientId, clientSecret, 500, phone, reference, reason);
 
                 // Create the connection
                 URL url = new URL(apiUrl);

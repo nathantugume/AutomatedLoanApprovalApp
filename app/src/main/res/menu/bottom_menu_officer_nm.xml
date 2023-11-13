@@ -12,8 +12,9 @@
         android:icon="@mipmap/report"
         android:title="Reports"/>
     <item
-        android:id="@+id/fab"
-        android:title=""
+        android:id="@+id/bottom_mng_loan"
+        android:title="Loan"
+        android:icon="@mipmap/loan"
 
     />
     <item
