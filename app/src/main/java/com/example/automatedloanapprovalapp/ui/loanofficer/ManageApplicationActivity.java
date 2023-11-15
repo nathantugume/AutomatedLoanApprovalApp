@@ -169,6 +169,8 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
         UserManager userManager = new UserManager(this);
         String uid = userManager.getCurrentUser().getUid();
 
+
+
         // Get the current date and time
         Date currentDate = Calendar.getInstance().getTime();
 
@@ -180,6 +182,7 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
         updateData.put("approvedBy", uid);
         updateData.put("approvedDate",formattedDate);
 
+
         firestoreCRUD.updateDocumentFields("transaction", transactionId,updateData, task -> {
             if (task.isSuccessful()){
                 // Call the disburseFunds function after updating the status
@@ -189,6 +192,7 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                         DocumentSnapshot documentSnapshot = task12.getResult();
                         String customerID = documentSnapshot.getString("userId");
                         int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
+                        int paybackAmount = Math.toIntExact(documentSnapshot.getLong("paybackAmount"));
 
                         Log.d("customerId",customerID+" ,"+String.valueOf(amount));
                         firestoreCRUD.readDocument("customer_details", customerID, task1 -> {
@@ -197,7 +201,7 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                                 String phoneNumber = snapshot.getString("phoneNumber");
                                 Log.d("manageApplication","phoneNumber:"+phoneNumber);
                                 Transaction transaction = new Transaction();
-                                transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId);
+                                transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId,paybackAmount);
                             }else
                             {
                                 Toast.makeText(ManageApplicationActivity.this, task1.getException().getMessage(), Toast.LENGTH_SHORT).show();

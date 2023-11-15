@@ -16,6 +16,18 @@
         android:theme="@style/Theme.AutomatedLoanApprovalApp"
         tools:targetApi="31">
         <activity
+            android:name=".ui.loanofficer.Reports.ProfitAndLossAnalysisActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.loanofficer.Reports.LoanTypeDistributionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.loanofficer.Reports.DisbursedLoansReport"
+            android:exported="false" />
+        <activity
+            android:name=".ui.loanofficer.Reports.LoanApprovalStatistics"
+            android:exported="false" />
+        <activity
             android:name=".ui.loanofficer.OfficerReportActivity"
             android:exported="false" />
         <activity

@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firestore.v1.Value;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -164,7 +163,7 @@ public class Transaction {
         this.userName = userName;
     }
 
-    public void disburseFunds(Context context, String phone, int amount, String docId) {
+    public void disburseFunds(Context context, String phone, int amount, String docId, int paybackAmount) {
 
         MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask(phone, amount);
         payoutTask.executePayout(new MobileMoneyPayoutTask.MobileMoneyPayoutListener() {
@@ -183,12 +182,8 @@ public class Transaction {
                     Map<String, Object> updateData = new HashMap<>();
                     updateData.put("status", "disbursed");
                     updateData.put("disbursedDate", formattedDate);
-                    firestoreCRUD.updateDocumentFields("transaction", docId, updateData, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    updateData.put("disbursedAmount",paybackAmount);
+                    firestoreCRUD.updateDocumentFields("transaction", docId, updateData, task -> Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show());
 
                 } catch (Exception e) {
                     Log.d("Payout",e.getMessage());
