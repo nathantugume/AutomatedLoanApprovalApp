@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 
 public class MobileMoneyPayoutTask {
     private String apiUrl = "https://www.easypay.co.ug/api/";
-    private String clientId = "720bd5a4d9e94aff";
-    private String clientSecret = "4e24c1bc3ef29542";
+    private String clientId = "";
+    private String clientSecret = "";
     private String phone;
     private int amount;
 
