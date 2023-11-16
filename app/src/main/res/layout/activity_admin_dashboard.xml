@@ -89,7 +89,7 @@
                         android:layout_margin="10dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="5dp"
-                        android:id="@+id/reports"
+                        android:id="@+id/adminReport"
                         >
                         <LinearLayout
                             android:layout_width="wrap_content"

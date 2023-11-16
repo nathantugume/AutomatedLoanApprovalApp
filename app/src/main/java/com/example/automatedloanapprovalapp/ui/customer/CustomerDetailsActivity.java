@@ -87,16 +87,21 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
 
-                        fullNameTextView.setText(information.getFullName());
-                        emailTextView.setText(information.getEmail());
-                        phoneNumberTextView.setText(information.getPhoneNumber());
-                        addressTextView.setText(information.getAddress());
-                        businessNameTextView.setText(information.getBusinessName());
-                        businessTypeTextView.setText(information.getBusinessType());
-                        genderTextView.setText(information.getGender());
-                        jobTitleTextView.setText(information.getJobTitle());
-                        monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
-                        nationalIDTextView.setText(information.getNationalID());
+                        try {
+                            fullNameTextView.setText(information.getFullName());
+                            emailTextView.setText(information.getEmail());
+                            phoneNumberTextView.setText(information.getPhoneNumber());
+                            addressTextView.setText(information.getAddress());
+                            businessNameTextView.setText(information.getBusinessName());
+                            businessTypeTextView.setText(information.getBusinessType());
+                            genderTextView.setText(information.getGender());
+                            jobTitleTextView.setText(information.getJobTitle());
+                            monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
+                            nationalIDTextView.setText(information.getNationalID());
+                        }catch (Exception e){
+                            Log.d("UserDetails",e.getMessage());
+                        }
+
 
                     }else
                     {
@@ -114,34 +119,30 @@ public class CustomerDetailsActivity extends AppCompatActivity {
 
             String uid = userManager.getCurrentUser().getUid();
 
-            firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()){
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
+            firestoreCRUD.readDocument("customer_details", uid, task -> {
+                if (task.isSuccessful()){
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    PersonalInformation information = documentSnapshot.toObject(PersonalInformation.class);
 
-                        fullNameTextView.setText(information.getFullName());
-                        emailTextView.setText(information.getEmail());
-                        phoneNumberTextView.setText(information.getPhoneNumber());
-                        addressTextView.setText(information.getAddress());
-                        businessNameTextView.setText(information.getBusinessName());
-                        businessTypeTextView.setText(information.getBusinessType());
-                        genderTextView.setText(information.getGender());
-                        jobTitleTextView.setText(information.getJobTitle());
-                        monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
-                        nationalIDTextView.setText(information.getNationalID());
+                    fullNameTextView.setText(information.getFullName());
+                    emailTextView.setText(information.getEmail());
+                    phoneNumberTextView.setText(information.getPhoneNumber());
+                    addressTextView.setText(information.getAddress());
+                    businessNameTextView.setText(information.getBusinessName());
+                    businessTypeTextView.setText(information.getBusinessType());
+                    genderTextView.setText(information.getGender());
+                    jobTitleTextView.setText(information.getJobTitle());
+                    monthlyIncomeTextView.setText("Ugx "+ numberFormat.format(information.getMonthlyIncome()));
+                    nationalIDTextView.setText(information.getNationalID());
 
-                    }else
-                    {
-                        Log.d("CustomerDetails",task.getException().getMessage());
-                    }
-
-
-
-
+                }else
+                {
+                    Log.d("CustomerDetails",task.getException().getMessage());
                 }
+
+
+
+
             });
         }
 

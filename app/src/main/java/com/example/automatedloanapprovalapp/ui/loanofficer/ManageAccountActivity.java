@@ -113,19 +113,15 @@ public class ManageAccountActivity extends AppCompatActivity {
                 }
             }
         });
-        firestoreCRUD.queryDocuments("users", "role", "customer", new OnCompleteListener<QuerySnapshot>() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    for (DocumentSnapshot document:task.getResult() ) {
-                   User user = document.toObject(User.class);
-                        assert user != null;
-                        user.setUserId(document.getId());
+        firestoreCRUD.queryDocuments("users", "role", "customer", task -> {
+            if (task.isSuccessful()){
+                for (DocumentSnapshot document:task.getResult() ) {
+               User user = document.toObject(User.class);
+                    assert user != null;
+                    user.setUserId(document.getId());
 
-                   userList.add(user);
-                   adapter.notifyDataSetChanged();
-                    }
+               userList.add(user);
+               adapter.notifyDataSetChanged();
                 }
             }
         });

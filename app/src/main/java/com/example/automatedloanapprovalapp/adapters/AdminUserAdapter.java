@@ -39,35 +39,31 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
         holder.emailTextView.setText(user.getEmail());
         holder.roleTextView.setText(user.getRole());
         // Edit Button Click Listener
-        holder.editImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onEditClickListener != null) {
-                    onEditClickListener.onEditClick(holder.getAdapterPosition());
-                    Toast.makeText(view.getContext(), "clicked"+holder.getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                }
+        holder.editImageView.setOnClickListener(view -> {
+            if (onEditClickListener != null) {
+                onEditClickListener.onEditClick(holder.getAdapterPosition());
             }
         });
 
         // Delete Button Click Listener
-        holder.deleteImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onDeleteClickListener != null) {
-                    onDeleteClickListener.onDeleteClick(holder.getAdapterPosition());
-                }
+        holder.deleteImageView.setOnClickListener(view -> {
+            if (onDeleteClickListener != null) {
+                onDeleteClickListener.onDeleteClick(holder.getAdapterPosition());
             }
         });
 
         // Details Button Click Listener
-        holder.userDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onDetailsClickListener != null) {
-                    onDetailsClickListener.onDetailsClick(holder.getAdapterPosition());
-                }
+        holder.userDetails.setOnClickListener(view -> {
+            if (onDetailsClickListener != null) {
+                onDetailsClickListener.onDetailsClick(holder.getAdapterPosition());
             }
         });
+
+        if (!user.getRole().equals("customer")){
+            holder.userDetails.setVisibility(View.GONE);
+            holder.moreDetailsArrow.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -80,7 +76,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
         TextView emailTextView;
         TextView roleTextView;
         TextView userDetails;
-        ImageView editImageView, deleteImageView;
+        ImageView editImageView, deleteImageView, moreDetailsArrow;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -90,6 +86,9 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
             editImageView = itemView.findViewById(R.id.editImageView);
             deleteImageView = itemView.findViewById(R.id.deleteImageView);
             userDetails = itemView.findViewById(R.id.more_details_txt);
+            moreDetailsArrow = itemView.findViewById(R.id.more_details_arrow);
+
+
         }
     }
 

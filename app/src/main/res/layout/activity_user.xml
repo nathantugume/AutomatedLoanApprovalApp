@@ -15,7 +15,6 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            app:menu="@menu/top_app_bar"
             app:navigationIcon="@drawable/back_arrow"
             app:title="Manage Users"
             app:titleCentered="true"
@@ -57,7 +56,10 @@
             app:menu="@menu/bottom_menu"
             android:id="@+id/bottom_navigationView"
             app:labelVisibilityMode="labeled"
+            app:itemTextColor="@color/white"
+            app:itemIconTint="@color/white"
             android:background="#0000"
+            app:elevation="0dp"
             />
 
     </com.google.android.material.bottomappbar.BottomAppBar>

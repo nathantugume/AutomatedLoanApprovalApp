@@ -49,6 +49,7 @@
     app:itemTextColor="@color/white"
     app:labelVisibilityMode="labeled"
     app:itemIconTint="@color/white"
+    app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
     android:id="@+id/bottom_navigation"/>
 
 

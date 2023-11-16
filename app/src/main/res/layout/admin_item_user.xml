@@ -44,6 +44,7 @@
                     android:textColor="@color/green"
                     android:text="More Details"/>
                 <ImageView
+                    android:id="@+id/more_details_arrow"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_arrow_options"/>

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +29,10 @@ import com.example.automatedloanapprovalapp.ui.customer.CustomerDetailsActivity;
 import com.example.automatedloanapprovalapp.ui.loanofficer.ManageAccountActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -53,69 +58,94 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
-        findViewById(R.id.fabAddUser).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Create a LayoutInflater to inflate the dialog_add_user.xml layout
-                LayoutInflater inflater = LayoutInflater.from(UserActivity.this);
-                View dialogView = inflater.inflate(R.layout.dialog_add_user, null);
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
+        toolbar.setTitle("Admin Manage Users");
 
-                // Find TextInputEditText views inside dialogView
-                usernameEdt = dialogView.findViewById(R.id.editTextUsername);
-                emailEdt = dialogView.findViewById(R.id.editTextEmail);
-                edtPassword = dialogView.findViewById(R.id.editTextPassword);
-                confirmPassordEdt = dialogView.findViewById(R.id.editTextConfirmPassword);
 
-                // Set up the Spinner with an ArrayAdapter
-                Spinner userRoleSpinner = dialogView.findViewById(R.id.userRoleSpinner);
-                setUpUserRoleSpinner(userRoleSpinner);
 
-                // Build the AlertDialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this);
-                builder.setView(dialogView)
-                        .setTitle("Add User")
-                        .setPositiveButton("Add", (dialogInterface, i) -> {
-                            String usernameTxt = usernameEdt.getText().toString();
-                            String emailTxt = emailEdt.getText().toString();
-                            String passwordTxt = edtPassword.getText().toString();
-                            String cPassword = confirmPassordEdt.getText().toString();
+        BottomAppBar bottomAppBar = findViewById(R.id.bottom_app_bar);
 
-                            validateInputs(usernameTxt, emailTxt, passwordTxt, cPassword);
-
-                            // Add your logic to save the user data
-                            User user = new User(usernameTxt, emailTxt, passwordTxt, selectedUserType);
-
-                            UserManager userManager = new UserManager(UserActivity.this);
-                            userManager.signUpUser(emailTxt, passwordTxt, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        String uid = userManager.getCurrentUser().getUid();
-                                        FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
-                                        firestoreCRUD.createDocumentWithId("users", uid, user, new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Toast.makeText(UserActivity.this, "User saved Successfully!!", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Toast.makeText(UserActivity.this, "Sorry we have failed to create a new User!!", Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        });
-                                    } else {
-                                        Toast.makeText(UserActivity.this, "User registration failed!", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        })
-                        .setNegativeButton("Cancel", (dialogInterface, i) -> {
-                            dialogInterface.dismiss(); // Dismiss the dialog
-                        });
-
-                // Create and show the dialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigationView);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.bottom_manager_home){
+                startActivity(new Intent(UserActivity.this, AdminDashboardActivity.class));
+                return true;
             }
+            if (item.getItemId() == R.id.bottom_reports){
+                startActivity(new Intent(UserActivity.this, AdminReportActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_transactions){
+                startActivity(new Intent(UserActivity.this,AdminTransactionActivity.class));
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_accounts){
+                startActivity(new Intent(UserActivity.this, UserActivity.class));
+            }
+            return false;
+        });
+
+        findViewById(R.id.fabAddUser).setOnClickListener(view -> {
+            // Create a LayoutInflater to inflate the dialog_add_user.xml layout
+            LayoutInflater inflater = LayoutInflater.from(UserActivity.this);
+            View dialogView = inflater.inflate(R.layout.dialog_add_user, null);
+
+            // Find TextInputEditText views inside dialogView
+            usernameEdt = dialogView.findViewById(R.id.editTextUsername);
+            emailEdt = dialogView.findViewById(R.id.editTextEmail);
+            edtPassword = dialogView.findViewById(R.id.editTextPassword);
+            confirmPassordEdt = dialogView.findViewById(R.id.editTextConfirmPassword);
+
+            // Set up the Spinner with an ArrayAdapter
+            Spinner userRoleSpinner = dialogView.findViewById(R.id.userRoleSpinner);
+            setUpUserRoleSpinner(userRoleSpinner);
+
+            // Build the AlertDialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this);
+            builder.setView(dialogView)
+                    .setTitle("Add User")
+                    .setPositiveButton("Add", (dialogInterface, i) -> {
+                        String usernameTxt = usernameEdt.getText().toString();
+                        String emailTxt = emailEdt.getText().toString();
+                        String passwordTxt = edtPassword.getText().toString();
+                        String cPassword = confirmPassordEdt.getText().toString();
+
+                        validateInputs(usernameTxt, emailTxt, passwordTxt, cPassword);
+
+                        // Add your logic to save the user data
+                        User user = new User(usernameTxt, emailTxt, passwordTxt, selectedUserType);
+
+                        UserManager userManager = new UserManager(UserActivity.this);
+                        userManager.signUpUser(emailTxt, passwordTxt, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    String uid = userManager.getCurrentUser().getUid();
+                                    FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
+                                    firestoreCRUD.createDocumentWithId("users", uid, user, new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(UserActivity.this, "User saved Successfully!!", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(UserActivity.this, "Sorry we have failed to create a new User!!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(UserActivity.this, "User registration failed!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    })
+                    .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                        dialogInterface.dismiss(); // Dismiss the dialog
+                    });
+
+            // Create and show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
 
 
@@ -129,35 +159,53 @@ public class UserActivity extends AppCompatActivity {
         adapter = new AdminUserAdapter(userList);
         recyclerView.setAdapter(adapter);
 
-
-        firestoreCRUD.getAllDocuments("users",  new OnCompleteListener<QuerySnapshot>() {
-            @SuppressLint("NotifyDataSetChanged")
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    for (DocumentSnapshot document:task.getResult() ) {
-                        User user = document.toObject(User.class);
-                        assert user != null;
-                        user.setUserId(document.getId());
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    // Scrolling up, hide the bottom navigation
+                    hideBottomNavigation();
+                } else if (dy < 0) {
+                    // Scrolling down, show the bottom navigation
+                    showBottomNavigation();
+                }
+            }
 
-                        userList.add(user);
-                        adapter.notifyDataSetChanged();
-                    }
+            private void showBottomNavigation() {
+                if (bottomAppBar.getVisibility() != View.VISIBLE) {
+                    bottomAppBar.setVisibility(View.VISIBLE);
+                }
+            }
+
+            private void hideBottomNavigation() {
+                if (bottomAppBar.getVisibility() == View.VISIBLE) {
+                    bottomAppBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        adapter.setOnEditClickListener(new AdminUserAdapter.OnEditClickListener() {
-            @Override
-            public void onEditClick(int position) {
-                // Implement edit functionality here
-                User user = userList.get(position);
 
-                // Show edit dialog or navigate to edit activity
+        firestoreCRUD.getAllDocuments("users", task -> {
+            if (task.isSuccessful()){
+                for (DocumentSnapshot document:task.getResult() ) {
+                    User user = document.toObject(User.class);
+                    assert user != null;
+                    user.setUserId(document.getId());
 
-                EditUserDialogFragment dialogFragment = new EditUserDialogFragment(user);
-                dialogFragment.show(getSupportFragmentManager(), "EditUserDialogFragment");
+                    userList.add(user);
+                    adapter.notifyDataSetChanged();
+                }
             }
+        });
+
+        adapter.setOnEditClickListener(position -> {
+            // Implement edit functionality here
+            User user = userList.get(position);
+
+            // Show edit dialog or navigate to edit activity
+
+            EditUserDialogFragment dialogFragment = new EditUserDialogFragment(user);
+            dialogFragment.show(getSupportFragmentManager(), "EditUserDialogFragment");
         });
 
         adapter.setOnDeleteClickListener(position -> {
