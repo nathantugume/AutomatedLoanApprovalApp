@@ -240,7 +240,7 @@
                         android:layout_margin="10dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="5dp"
-                       android:id="@+id/settings"
+                       android:id="@+id/adminSettings"
                         >
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -285,6 +285,5 @@
         tools:openDrawer="start"
         android:layout_gravity="start"
 
-
-        />
+             />
 </androidx.drawerlayout.widget.DrawerLayout>

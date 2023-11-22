@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.number.FormattedNumber;
@@ -28,12 +29,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 public class EligibilityCheckActivity extends AppCompatActivity {
 
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private UserManager userManager = new UserManager(EligibilityCheckActivity.this);
     NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+    private  CreditScoreCalculator creditScoreCalculator;
 
 
     @Override
@@ -45,72 +48,78 @@ public class EligibilityCheckActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(view -> onBackPressed());
         BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
 
-                if (item.getItemId() == R.id.bottom_menu_home){
-                    Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDashboardActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_account){
-                    Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDetailsActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_repay){
-                    Intent intent = new Intent(EligibilityCheckActivity.this, RepaymentActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_status){
-                    Intent intent = new Intent(EligibilityCheckActivity.this, ApplicationStatusActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
+            if (item.getItemId() == R.id.bottom_menu_home){
+                Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDashboardActivity.class);
+                startActivity(intent);
+                return true;
             }
+            if (item.getItemId() == R.id.bottom_menu_account){
+                Intent intent = new Intent(EligibilityCheckActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_repay){
+                Intent intent = new Intent(EligibilityCheckActivity.this, RepaymentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_status){
+                Intent intent = new Intent(EligibilityCheckActivity.this, ApplicationStatusActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
 
         String uid = userManager.getCurrentUser().getUid();
 
         Button button =  findViewById(R.id.applyBtn);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(EligibilityCheckActivity.this, EligibilityCheckActivity.class);
-                startActivity(intent);
-            }
+        button.setOnClickListener(view -> {
+            Intent intent = new Intent(EligibilityCheckActivity.this, LoanApplicationActivity.class);
+            startActivity(intent);
         });
+        creditScoreCalculator = new CreditScoreCalculator();
+
+        CompletableFuture<Void> setFactorsFuture = creditScoreCalculator.setFactors();
+
+        setFactorsFuture.thenRun(() -> {
+            // Show ProgressDialog
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Processing...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
 
 
-        firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            firestoreCRUD.readDocument("customer_details", uid, task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
+
+
                         PersonalInformation personalInformation = document.toObject(PersonalInformation.class);
 
                         if (personalInformation != null) {
                             CreditScoreCalculator creditScoreCalculator = new CreditScoreCalculator();
+                            creditScoreCalculator.setFactors();
                             int creditScore = creditScoreCalculator.calculateCreditScore(personalInformation);
 
                             creditScoreCalculator.setCreditScore(creditScore);
                             int loan_limit = creditScoreCalculator.calculateLoanAmount(creditScore);
 
-                            loanLimit.setText("Ugx "+String.valueOf(numberFormat.format(loan_limit)));
+                            loanLimit.setText("Ugx " + String.valueOf(numberFormat.format(loan_limit)));
 
+                            progressDialog.dismiss();
 
 
                         }
                     }
 
                 }
-            }
+            });
+
         });
     }
 }

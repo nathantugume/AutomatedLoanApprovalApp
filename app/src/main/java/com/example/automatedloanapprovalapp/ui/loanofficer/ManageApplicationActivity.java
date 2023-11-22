@@ -168,7 +168,10 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
     public void onTransactionClick(String transactionId) {
         UserManager userManager = new UserManager(this);
         String uid = userManager.getCurrentUser().getUid();
-
+        // Show progress dialog
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Processing please wait...");
+        progressDialog.show();
 
 
         // Get the current date and time
@@ -194,13 +197,11 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                         int amount = Math.toIntExact(documentSnapshot.getLong("requestedAmount"));
                         int paybackAmount = Math.toIntExact(documentSnapshot.getLong("paybackAmount"));
 
-                        Log.d("customerId",customerID+" ,"+String.valueOf(amount));
                         firestoreCRUD.readDocument("customer_details", customerID, task1 -> {
                             if (task1.isSuccessful()){
                                 DocumentSnapshot snapshot = task1.getResult();
                                 String phoneNumber = snapshot.getString("phoneNumber");
-                                Log.d("manageApplication","phoneNumber:"+phoneNumber);
-                                Transaction transaction = new Transaction();
+                                                           Transaction transaction = new Transaction();
                                 transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId,paybackAmount);
                             }else
                             {
@@ -208,25 +209,17 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                             }
                         });
 
-
                     }
                 });
 
-
-                Toast.makeText(ManageApplicationActivity.this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
 
             }else {
                 Toast.makeText(ManageApplicationActivity.this, "Failed to approve loan, please try again!!", Toast.LENGTH_SHORT).show();
             }
         });
-      //  Toast.makeText(this, "clicked "+transactionId, Toast.LENGTH_SHORT).show();
+
     }
-//    private void disburseFunds(String transactionId) {
-//        // To execute the task, create an instance of DisburseFundsTask and call execute():
-//        MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask();
-//        payoutTask.execute();
-//        Toast.makeText(this, "clicked"+transactionId, Toast.LENGTH_SHORT).show();
-//    }
+
 
 
 

@@ -2,17 +2,13 @@ package com.example.automatedloanapprovalapp.ui.admin;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.fragments.NotificationFragment;
-import com.example.automatedloanapprovalapp.ui.loanofficer.ManageLoanActivity;
-import com.example.automatedloanapprovalapp.ui.loanofficer.TransactionActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -46,8 +42,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
         CardView transaction_card = findViewById(R.id.admin_transaction_card);
         CardView loan_management_card = findViewById(R.id.loan_mgt);
         CardView adminReport = findViewById(R.id.adminReport);
+        CardView adminSettings = findViewById(R.id.adminSettings);
 
-        adminReport.setOnClickListener(view ->
+        adminSettings.setOnClickListener(view ->
+                startActivity(new Intent(AdminDashboardActivity.this,AdminSettingsActivity.class)));
+
+                adminReport.setOnClickListener(view ->
                 startActivity(new Intent(AdminDashboardActivity.this,AdminReportActivity.class)));
 
 

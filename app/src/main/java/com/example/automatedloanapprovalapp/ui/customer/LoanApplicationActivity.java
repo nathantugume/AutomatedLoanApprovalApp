@@ -35,6 +35,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class LoanApplicationActivity extends AppCompatActivity {
 
@@ -49,6 +50,7 @@ public class LoanApplicationActivity extends AppCompatActivity {
     private TextView creditScoreTxt,loanAmountTxt;
     private int loanAmount;
     private int creditScore;
+    private CreditScoreCalculator creditScoreCalculator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,34 +118,48 @@ public class LoanApplicationActivity extends AppCompatActivity {
                 Toast.makeText(LoanApplicationActivity.this, Objects.requireNonNull(task.getException()).toString(), Toast.LENGTH_SHORT).show();
             }
         });
+        creditScoreCalculator = new CreditScoreCalculator();
 
-        // calculate credit score and loan limit using personal information
-        firestoreCRUD.readDocument("customer_details", uid, task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    PersonalInformation personalInformation = document.toObject(PersonalInformation.class);
+        CompletableFuture<Void> setFactorsFuture = creditScoreCalculator.setFactors();
 
-                    if (personalInformation != null) {
-                        CreditScoreCalculator creditScoreCalculator = new CreditScoreCalculator();
-                        creditScore = creditScoreCalculator.calculateCreditScore(personalInformation);
-                        creditScoreTxt.setText(String.valueOf(creditScore));
-                        creditScoreCalculator.setCreditScore(creditScore);
-                        loanAmount = creditScoreCalculator.calculateLoanAmount(creditScore);
+        setFactorsFuture.thenRun(() -> {
+            // Show ProgressDialog
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Processing...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+            // calculate credit score and loan limit using personal information
+            firestoreCRUD.readDocument("customer_details", uid, task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        PersonalInformation personalInformation = document.toObject(PersonalInformation.class);
 
-                        loanAmountTxt.setText(String.valueOf(loanAmount));
-                        creditScoreCalculator.setCalculatedCreditAmount(loanAmount);
+                        if (personalInformation != null) {
+                            creditScoreCalculator = new CreditScoreCalculator();
+                            creditScore = creditScoreCalculator.calculateCreditScore(personalInformation);
+                            creditScoreTxt.setText(String.valueOf(creditScore));
+                            creditScoreCalculator.setCreditScore(creditScore);
+                            loanAmount = creditScoreCalculator.calculateLoanAmount(creditScore);
 
-                        // Save the calculated credit amount to SharedPreferences
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LoanApplicationActivity.this);
-                        sharedPreferences.edit().putFloat("calculated_credit_amount", (float) loanAmount).apply();
+                            loanAmountTxt.setText(String.valueOf(loanAmount));
+                            creditScoreCalculator.setCalculatedCreditAmount(loanAmount);
+
+                            // Save the calculated credit amount to SharedPreferences
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LoanApplicationActivity.this);
+                            sharedPreferences.edit().putFloat("calculated_credit_amount", (float) loanAmount).apply();
+                            progressDialog.dismiss();
+                        }
+                    }else {
+                        Log.d("LoanApplicationActivity", task.getException().getMessage());
+                        progressDialog.dismiss();
+                        Toast.makeText(this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+
                 }
+            });
 
-            }
         });
-
-
     }
 
 

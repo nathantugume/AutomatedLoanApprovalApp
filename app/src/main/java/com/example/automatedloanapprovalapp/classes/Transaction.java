@@ -32,6 +32,12 @@ public class Transaction {
     private String approvedBy;
     private double repaidAmount;
 
+    private double principal;
+
+    private String nextPaymentDate;
+
+    private String repaymentStatus;
+
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
 
     public Transaction() {
@@ -39,13 +45,14 @@ public class Transaction {
     }
 
     public Transaction(String userId, String loanType, double requestedAmount, double paybackAmount,
-                       String dateRequested, String status) {
+                       String dateRequested, String status, double principal) {
         this.userId = userId;
         this.loanType = loanType;
         this.requestedAmount = requestedAmount;
         this.paybackAmount = paybackAmount;
         this.dateRequested = dateRequested;
         this.status = status;
+        this.principal = principal;
     }
 
     public Transaction(String id, String userId, String loanType, double requestedAmount, double paybackAmount, String dateRequested, String status, String userName) {
@@ -57,6 +64,30 @@ public class Transaction {
         this.status = status;
         this.userName = userName;
         this.id = id;
+    }
+
+    public double getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(double principal) {
+        this.principal = principal;
+    }
+
+    public String getNextPaymentDate() {
+        return nextPaymentDate;
+    }
+
+    public void setNextPaymentDate(String nextPaymentDate) {
+        this.nextPaymentDate = nextPaymentDate;
+    }
+
+    public String getRepaymentStatus() {
+        return repaymentStatus;
+    }
+
+    public void setRepaymentStatus(String repaymentStatus) {
+        this.repaymentStatus = repaymentStatus;
     }
 
     public String getUserId() {
@@ -167,11 +198,13 @@ public class Transaction {
 
         MobileMoneyPayoutTask payoutTask = new MobileMoneyPayoutTask(phone, amount);
         payoutTask.executePayout(new MobileMoneyPayoutTask.MobileMoneyPayoutListener() {
+
+
             @Override
-            public void onPayoutSuccess() {
-                // Handle successful payout
+            public void onPayoutSuccess(Object jsonResponse) {
+                Log.d("TransactionPayout", jsonResponse.toString());
                 try {
-                 //   Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
+                    //   Toast.makeText(context, "Money has been transferred to your account successfully", Toast.LENGTH_SHORT).show();
                     FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
                     // Get the current date and time
                     Date currentDate = Calendar.getInstance().getTime();
@@ -179,22 +212,49 @@ public class Transaction {
                     // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                     String formattedDate = dateFormat.format(currentDate);
+
+                    // Calculate the next payment date (one month from disbursed date)
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(currentDate);
+                    calendar.add(Calendar.MONTH, 1);
+                    Date nextPaymentDate = calendar.getTime();
+                    String formattedNextPaymentDate = dateFormat.format(nextPaymentDate);
+
                     Map<String, Object> updateData = new HashMap<>();
                     updateData.put("status", "disbursed");
                     updateData.put("disbursedDate", formattedDate);
                     updateData.put("disbursedAmount",paybackAmount);
-                    firestoreCRUD.updateDocumentFields("transaction", docId, updateData, task -> Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show());
-
+                    updateData.put("nextPaymentDate",formattedNextPaymentDate);
+                    firestoreCRUD.updateDocumentFields("transaction", docId, updateData, task ->
+                            Toast.makeText(context, "Account credited successfully !!", Toast.LENGTH_SHORT).show());
+                    sendNotification();
                 } catch (Exception e) {
                     Log.d("Payout",e.getMessage());
 
-                }   
+                }
+            }
+
+            private void sendNotification() {
+                Map<String, String> userStatus = new HashMap<>();
+                userStatus.put(userId,"unread");
+                Notification notification = new Notification("Your Account has been Credited with "+amount,"customer","Management",disbursedDate,userStatus);
+                firestoreCRUD.createDocument("notifications", notification, new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()){
+                            Log.d("Notification","transaction notification sent");
+                        }
+                        else {
+                            Log.d("Notification","transaction "+task.getException().getMessage());
+                        }
+                    }
+                });
+
             }
 
             @Override
             public void onPayoutFailure() {
                 // Handle payout failure
-
             Log.d("Failed", "payout failed");
             }
         });
@@ -222,34 +282,51 @@ public class Transaction {
                 // Format the current date as a string in the desired format (e.g., "yyyy-MM-dd HH:mm:ss")
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 String formattedDate = dateFormat.format(currentDate);
+
+                // Calculate the next payment date (one month from disbursed date)
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(currentDate);
+                calendar.add(Calendar.MONTH, 1);
+                Date nextPaymentDate = calendar.getTime();
+                String formattedNextPaymentDate = dateFormat.format(nextPaymentDate);
                 Map<String, Object> updatedData = new HashMap<>();
                 updatedData.put("status", status);
                 updatedData.put("paybackAmount", balance);
                 updatedData.put("repaidAmount", amount);
                 updatedData.put("repaymentDate", formattedDate);
+                updatedData.put("nextPaymentDate",formattedNextPaymentDate);
 
-                firestoreCRUD.updateDocumentFields("transaction", transactionId, updatedData, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            updatedData.put("transactionId", transactionId);
-                            Toast.makeText(context, "Transaction completed successfully!!", Toast.LENGTH_SHORT).show();
-                            firestoreCRUD.createDocument("Repayment", updatedData, new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d("RepaymentData", "Data added successfully");
-                                    } else {
-                                        Log.d("RepaymentData", task.getException().getMessage());
-                                    }
+                firestoreCRUD.updateDocumentFields("transaction", transactionId, updatedData, task -> {
+                    if (task.isSuccessful()) {
+                        updatedData.put("transactionId", transactionId);
+                        Toast.makeText(context, "Transaction completed successfully!!", Toast.LENGTH_SHORT).show();
+                        firestoreCRUD.createDocument("Repayment", updatedData, task1 -> {
+                            if (task1.isSuccessful()) {
+                                Log.d("RepaymentData", "Data added successfully");
+                                sendNotification();
+                            } else {
+                                Log.d("RepaymentData", task1.getException().getMessage());
+                            }
 
-                                }
-                            });
-                        }
-
+                        });
                     }
+
                 });
                 Log.d("Success", "deposit successful"+s);
+            }
+
+            private void sendNotification() {
+
+                Notification notification = new Notification("New payment of Ugx "+amount+" has been credited on the account!","management","Management",disbursedDate);
+                firestoreCRUD.createDocument("notifications", notification, task -> {
+                    if (task.isSuccessful()){
+                        Log.d("Notification","transaction notification sent");
+                    }
+                    else {
+                        Log.d("Notification","transaction "+task.getException().getMessage());
+                    }
+                });
+
             }
 
             @Override

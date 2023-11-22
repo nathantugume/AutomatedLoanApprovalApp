@@ -3,6 +3,7 @@ package com.example.automatedloanapprovalapp.ui.login;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,47 +59,57 @@ public class LogInActivity extends AppCompatActivity {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
-
+            // Show progress dialog
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Signing In...");
+            progressDialog.show();
             userManager.signInUser(email, password, task -> {
                 if (task.isSuccessful()){
                     String uid = null;
                     if (!userManager.getCurrentUser().getUid().isEmpty()){
                         uid  = userManager.getCurrentUser().getUid();
                     }else {
+                        progressDialog.dismiss();
                         Toast.makeText(LogInActivity.this, "login failed please try again!!", Toast.LENGTH_SHORT).show();
                         userManager.signOutUser();
                     }
                     firestoreCRUD.readDocument("users", uid, task1 -> {
                         DocumentSnapshot documentSnapshot = task1.getResult();
                         String role = documentSnapshot.getString("role");
-                        Log.d("role","role: "+role);
+
 
                         try {
                             switch (role){
                                 case "default":
                                 case  "admin":
+                                    progressDialog.dismiss();
                                     Intent intent = new Intent(LogInActivity.this, AdminDashboardActivity.class);
                                     startActivity(intent);
                                     break;
                                 case "loan_manager":
+                                    progressDialog.dismiss();
                                     intent = new Intent(LogInActivity.this, OfficerDashboardActivity.class);
                                     startActivity(intent);
                                     break;
                                 case "customer":
+                                    progressDialog.dismiss();
                                     intent = new Intent(LogInActivity.this, CustomerDashboardActivity.class);
                                     startActivity(intent);
                                     break;
                                 default:
+                                    progressDialog.dismiss();
                                     Toast.makeText(LogInActivity.this, "Invalid user role please contact Admin", Toast.LENGTH_LONG).show();
 
                             }
                         }catch (Exception e){
+                            progressDialog.dismiss();
                             Log.d("error",e.getMessage());
                         }
 
                     });
                 }
                 else {
+                    progressDialog.dismiss();
                     task.addOnFailureListener(e -> Toast.makeText(LogInActivity.this, e.getMessage(), Toast.LENGTH_LONG).show());
                 }
 
@@ -123,13 +134,13 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     // Validation methods
-    private boolean isValidEmail(String email) {
-        // Implement your email validation logic here
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    private boolean isValidPassword(String password) {
-        // Implement your password validation logic here (e.g., minimum length)
-        return password.length() >= 6;
-    }
+//    private boolean isValidEmail(String email) {
+//        // Implement your email validation logic here
+//        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+//    }
+//
+//    private boolean isValidPassword(String password) {
+//        // Implement your password validation logic here (e.g., minimum length)
+//        return password.length() >= 6;
+//    }
 }

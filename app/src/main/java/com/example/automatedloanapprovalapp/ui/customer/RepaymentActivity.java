@@ -1,9 +1,12 @@
 package com.example.automatedloanapprovalapp.ui.customer;
 
+import static com.example.automatedloanapprovalapp.classes.InstalmentCalculator.calculateInstallment;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
+import com.example.automatedloanapprovalapp.classes.LoanType;
 import com.example.automatedloanapprovalapp.classes.MobileMoneyDepositTask;
 import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
@@ -29,6 +33,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -36,6 +41,12 @@ public class RepaymentActivity extends AppCompatActivity {
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private UserManager userManager = new UserManager(RepaymentActivity.this);
     private  String uid = userManager.getCurrentUser().getUid();
+
+    private  Transaction transaction;
+
+    private TextView installmentTxt;
+
+    private  ProgressDialog progressDialog;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -45,33 +56,31 @@ public class RepaymentActivity extends AppCompatActivity {
         MaterialToolbar toolbar = findViewById(R.id.topAppBar);
         toolbar.setNavigationOnClickListener(view -> onBackPressed());
         BottomNavigationView bottomNavigationView  = findViewById(R.id.bottom_navigationView);
+        installmentTxt = findViewById(R.id.txtInstallmentAmount);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
 
-                if (item.getItemId() == R.id.bottom_menu_home){
-                    Intent intent = new Intent(RepaymentActivity.this, CustomerDashboardActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_account){
-                    Intent intent = new Intent(RepaymentActivity.this, CustomerDetailsActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_repay){
-                    Intent intent = new Intent(RepaymentActivity.this, RepaymentActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                if (item.getItemId() == R.id.bottom_menu_status){
-                    Intent intent = new Intent(RepaymentActivity.this, ApplicationStatusActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
+            if (item.getItemId() == R.id.bottom_menu_home){
+                Intent intent = new Intent(RepaymentActivity.this, CustomerDashboardActivity.class);
+                startActivity(intent);
+                return true;
             }
+            if (item.getItemId() == R.id.bottom_menu_account){
+                Intent intent = new Intent(RepaymentActivity.this, CustomerDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_repay){
+                Intent intent = new Intent(RepaymentActivity.this, RepaymentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            if (item.getItemId() == R.id.bottom_menu_status){
+                Intent intent = new Intent(RepaymentActivity.this, ApplicationStatusActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
 
         TextView loanBalanceTxt = findViewById(R.id.loanBalance);
@@ -81,6 +90,7 @@ public class RepaymentActivity extends AppCompatActivity {
         final String[] status = new String[1];
         final int[] paybackAmount = new int[1];
         final String[] phoneNumber = new String[1];
+        final String[] loanType = new String[1];
 
         payAmountEdt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -112,6 +122,11 @@ public class RepaymentActivity extends AppCompatActivity {
             }
         });
 
+        // Show ProgressDialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Processing ...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         firestoreCRUD.readDocument("customer_details", uid, new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -119,44 +134,59 @@ public class RepaymentActivity extends AppCompatActivity {
                 phoneNumber[0] = documentSnapshot.getString("phoneNumber");
             }
         });
-        firestoreCRUD.queryDocuments("transaction", "userId", uid, new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    QuerySnapshot snapshot = task.getResult();
-                    if (snapshot != null) {
-                        for (QueryDocumentSnapshot document : snapshot) {
-                            // Get the document ID
-                             transactionId[0] = document.getId();
-                             status[0] = document.getString("status");
-                             paybackAmount[0] = Math.toIntExact(document.getLong("paybackAmount"));
+        firestoreCRUD.queryDocuments("transaction", "userId", uid, task -> {
+            if (task.isSuccessful()){
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null) {
+                    for (QueryDocumentSnapshot document : snapshot) {
+                        transaction = document.toObject(Transaction.class);
+                        // Get the document ID
+                         transactionId[0] = document.getId();
+                         status[0] = document.getString("status");
+                         paybackAmount[0] = Math.toIntExact(document.getLong("paybackAmount"));
+                         loanType[0] = document.getString("loanType");
 
-                        }
-                        loanBalanceTxt.setText("Ugx "+paybackAmount[0]);
-                    }else
-                    {
-                        Log.d("amount",transactionId[0]+ Arrays.toString(transactionId));
-                        loanBalanceTxt.setText("Ugx 0");
-                        Toast.makeText(RepaymentActivity.this, "data is empty", Toast.LENGTH_SHORT).show();
+                            installmentCalc();
+
                     }
-                }else {
-                    Toast.makeText(RepaymentActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    loanBalanceTxt.setText("Ugx "+paybackAmount[0]);
+                }else
+                {
+                    Log.d("amount",transactionId[0]+ Arrays.toString(transactionId));
+                    loanBalanceTxt.setText("Ugx 0");
+                    Toast.makeText(RepaymentActivity.this, "data is empty", Toast.LENGTH_SHORT).show();
                 }
-
+            }else {
+                Toast.makeText(RepaymentActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
 
+        });
 
         payBtn.setOnClickListener(view -> {
         int amount = Integer.parseInt(Objects.requireNonNull(payAmountEdt.getText()).toString());
-         Log.d("payAmount",String.valueOf(amount));
           Transaction transaction = new Transaction();
           transaction.payback(RepaymentActivity.this,amount,transactionId[0],phoneNumber[0],paybackAmount[0]);
+
             // Execute the MobileMoneyDepositTask
             Log.d("button pay","pressed");
 
 
+        });
+    }
 
+    private void installmentCalc() {
+        firestoreCRUD.queryDocuments("loanTypes", "type", transaction.getLoanType(), task -> {
+            if (task.isSuccessful()){
+                for (QueryDocumentSnapshot snapshot: task.getResult() ) {
+                    LoanType loanType1 = snapshot.toObject(LoanType.class);
+                    Double monthlyInstallment =  calculateInstallment(transaction.getRequestedAmount(),loanType1.getInterestRate(),loanType1.getDurationAsInt());
+                    NumberFormat numberFormat = NumberFormat.getNumberInstance(); // You can choose a different format if needed
+                    String formattedInstallment = numberFormat.format(Math.ceil(monthlyInstallment));
+                    installmentTxt.setText(formattedInstallment);
+                    progressDialog.dismiss();
+
+                }
+            }
         });
     }
 }

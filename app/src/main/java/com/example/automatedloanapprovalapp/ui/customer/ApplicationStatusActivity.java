@@ -93,87 +93,80 @@ public class ApplicationStatusActivity extends AppCompatActivity {
         String uid = userManager.getCurrentUser().getUid();
 
         FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
-        firestoreCRUD.queryDocuments("transaction", "userId", uid, new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot querySnapshot = task.getResult().getDocuments().get(0);
-                    String status = querySnapshot.getString("status");
-                    String approvedBy = querySnapshot.getString("approvedBy");
-                    String dateApproved = querySnapshot.getString("approvedDate");
-                    String requestedDate = querySnapshot.getString("dateRequested");
-                    String repaymentDate = querySnapshot.getString("repaymentDate");
-                    amount = Math.toIntExact(querySnapshot.getLong("requestedAmount"));
-                    repayAmount = Math.toIntExact(querySnapshot.getLong("paybackAmount"));
-                    String disbursedDate = querySnapshot.getString("disbursedDate");
+        firestoreCRUD.queryDocuments("transaction", "userId", uid, task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot querySnapshot = task.getResult().getDocuments().get(0);
+                String status = querySnapshot.getString("status");
+                String approvedBy = querySnapshot.getString("approvedBy");
+                String dateApproved = querySnapshot.getString("approvedDate");
+                String requestedDate = querySnapshot.getString("dateRequested");
+                String repaymentDate = querySnapshot.getString("repaymentDate");
+                amount = Math.toIntExact(querySnapshot.getLong("requestedAmount"));
+                repayAmount = Math.toIntExact(querySnapshot.getLong("paybackAmount"));
+                String disbursedDate = querySnapshot.getString("disbursedDate");
 
-                    pendingDateTxt.setText(requestedDate);
-                    try {
-                        assert approvedBy != null;
-                        if (!approvedBy.isEmpty()) {
-                            firestoreCRUD.readDocument("users", approvedBy, new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot snapshot = task.getResult();
-                                        String username = snapshot.getString("username");
-                                        try {
-                                            approvedCard.setVisibility(View.VISIBLE);
-                                            approvedEmailTxt.setText(username);
-                                            dateApprovedTxt.setText(dateApproved);
-                                        }catch (Exception exception){
-                                            Log.d("ApprovedStatus",exception.getMessage());
-                                        }
-
-
-
-                                    }
+                pendingDateTxt.setText(requestedDate);
+                try {
+                    if (!approvedBy.isEmpty()) {
+                        firestoreCRUD.readDocument("users", approvedBy, task1 -> {
+                            if (task1.isSuccessful()) {
+                                DocumentSnapshot snapshot = task1.getResult();
+                                String username = snapshot.getString("username");
+                                try {
+                                    approvedCard.setVisibility(View.VISIBLE);
+                                    approvedEmailTxt.setText(username);
+                                    dateApprovedTxt.setText(dateApproved);
+                                }catch (Exception exception){
+                                    Log.d("ApprovedStatus",exception.getMessage());
                                 }
-                            });
 
-                        }
-                    }catch (Exception e){
-                        Log.d("ApprovedStatus",e.getMessage());
-                    }
 
-                    try {
-                        assert disbursedDate != null;
-                        if (!disbursedDate.isEmpty()) {
-                            disbursedCard.setVisibility(View.VISIBLE);
-                            disbursedAmountTxt.setText(String.valueOf(amount));
-                            dateDisbursed.setText(disbursedDate);
-                        }
-                    } catch (Exception e) {
-                        Log.d("disbursedStatus", e.getMessage());
-                    }
 
-                    try {
-                        assert repaymentDate != null;
-                        if (!repaymentDate.isEmpty()){
-                            partialPaymentCard.setVisibility(View.VISIBLE);
-                            partialBalanceTxt.setText(String.valueOf(repayAmount));
-                            lastPaidTxt.setText(repaymentDate);
-                        }
-                    }catch (Exception e){
-                        Log.d("repayment", e.getMessage());
-                    }
-
-                    try {
-                        {
-                            assert status != null;
-                            if (status.equals("fully_paid")){
-                                completedBalanceCard.setVisibility(View.VISIBLE);
-                                completeBalanceTxt.setText(String.valueOf(repayAmount));
-                                completeDateTxt.setText(repaymentDate);
                             }
-                        }
-                    }catch (Exception e){
+                        });
 
-                        Log.d("RepaymentCard",e.getMessage());
                     }
-
-
+                }catch (Exception e){
+                    Log.d("ApprovedStatus",e.getMessage());
                 }
+
+                try {
+
+                    if (!disbursedDate.isEmpty()) {
+                        disbursedCard.setVisibility(View.VISIBLE);
+                        disbursedAmountTxt.setText(String.valueOf(amount));
+                        dateDisbursed.setText(disbursedDate);
+                    }
+                } catch (Exception e) {
+                    Log.d("disbursedStatus", e.getMessage());
+                }
+
+                try {
+
+                    if (!repaymentDate.isEmpty()){
+                        partialPaymentCard.setVisibility(View.VISIBLE);
+                        partialBalanceTxt.setText(String.valueOf(repayAmount));
+                        lastPaidTxt.setText(repaymentDate);
+                    }
+                }catch (Exception e){
+                    Log.d("repayment", e.getMessage());
+                }
+
+                try {
+                    {
+
+                        if (status.equals("fully_paid")){
+                            completedBalanceCard.setVisibility(View.VISIBLE);
+                            completeBalanceTxt.setText(String.valueOf(repayAmount));
+                            completeDateTxt.setText(repaymentDate);
+                        }
+                    }
+                }catch (Exception e){
+
+                    Log.d("RepaymentCard",e.getMessage());
+                }
+
+
             }
         });
 

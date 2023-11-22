@@ -1,23 +1,33 @@
 package com.example.automatedloanapprovalapp.classes;
-import android.annotation.SuppressLint;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class MobileMoneyPayoutTask {
-    private String apiUrl = "https://www.easypay.co.ug/api/";
-    private String clientId = "720bd5a4d9e94aff";
-    private String clientSecret = "4e24c1bc3ef29542";
-    private String phone;
-    private int amount;
+    private static final String API_URL = "https://www.easypay.co.ug/api/";
+    private static final String CLIENT_ID = "720bd5a4d9e94aff";
+    private static final String CLIENT_SECRET = "4e24c1bc3ef29542";
+    private final String phone;
+    private final int amount;
 
     public interface MobileMoneyPayoutListener {
-        void onPayoutSuccess();
+        void onPayoutSuccess(Object jsonResponse);
         void onPayoutFailure();
     }
 
@@ -27,34 +37,32 @@ public class MobileMoneyPayoutTask {
     }
 
     private String formatPhoneNumber(String rawPhoneNumber) {
-        // Check for null and empty string
         if (rawPhoneNumber != null && !rawPhoneNumber.isEmpty()) {
-            // Remove preceding 0 and add 256 to the phone number
             return rawPhoneNumber.replaceFirst("^0", "256");
         } else {
-            // Handle null or empty input, return an empty string or throw an exception
-            // For example, you can return an empty string:
             return "";
-
-            // Or you can throw an exception:
-            // throw new IllegalArgumentException("Invalid phone number");
         }
     }
-
 
     public void executePayout(MobileMoneyPayoutListener listener) {
         CompletableFuture.runAsync(() -> {
             try {
-                URL url = new URL(apiUrl);
+                URL url = new URL(API_URL);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
+                String reference = generateUniqueReference();
 
-                @SuppressLint("DefaultLocale") String payload = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"action\":\"mmpayout\",\"amount\":%d,\"phone\":\"%s\"}",
-                        clientId, clientSecret, 500, "256783836394");
+                Map<String, Object> payloadMap = new HashMap<>();
+                payloadMap.put("username", CLIENT_ID);
+                payloadMap.put("password", CLIENT_SECRET);
+                payloadMap.put("action", "mmpayout");
+                payloadMap.put("amount", amount);
+                payloadMap.put("phone", phone);
+                payloadMap.put("reference",reference);
 
-                Log.d("payload",payload);
+                String payload = new Gson().toJson(payloadMap);
 
                 try (OutputStream os = connection.getOutputStream()) {
                     byte[] input = payload.getBytes(StandardCharsets.UTF_8);
@@ -64,22 +72,37 @@ public class MobileMoneyPayoutTask {
                 int responseCode = connection.getResponseCode();
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    Log.d("payout","response"+responseCode);
-                    listener.onPayoutSuccess();
+                    try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = in.readLine()) != null) {
+                            response.append(line);
+                        }
+
+                        Gson gson = new Gson();
+                        Object jsonResponse = gson.fromJson(response.toString(), Object.class);
+
+                        new Handler(Looper.getMainLooper()).post(() -> listener.onPayoutSuccess(jsonResponse));
+                    }
                 } else {
-                    listener.onPayoutFailure();
+                    new Handler(Looper.getMainLooper()).post(listener::onPayoutFailure);
                 }
             } catch (Exception e) {
                 Log.e("MobileMoneyPayoutTask", "Error: " + e.getMessage());
                 e.printStackTrace();
-                listener.onPayoutFailure();
+                new Handler(Looper.getMainLooper()).post(listener::onPayoutFailure);
             }
         }, getExecutor());
     }
 
     private Executor getExecutor() {
-        // You can customize the executor as per your requirements.
-        return Executors.newFixedThreadPool(5); // Example: Using a fixed thread pool with 5 threads
+        return Executors.newFixedThreadPool(5);
+    }
+    // Helper method to generate a unique reference
+    private String generateUniqueReference() {
+        // Use a combination of timestamp and UUID to create a unique reference
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String uuid = UUID.randomUUID().toString();
+        return timestamp + "_" + uuid;
     }
 }
-

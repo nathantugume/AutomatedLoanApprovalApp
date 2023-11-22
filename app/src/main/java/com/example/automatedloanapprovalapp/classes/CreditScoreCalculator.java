@@ -1,26 +1,40 @@
 package com.example.automatedloanapprovalapp.classes;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.concurrent.CompletableFuture;
+
 public class CreditScoreCalculator {
     // Factors and their respective weights for credit score calculation
-    private static final int AGE_WEIGHT = 20;
-    private static final int MONTHLY_INCOME_WEIGHT = 25;
-    private static final int BUSINESS_REVENUE_WEIGHT = 15;
-    private static final int DEPENDENTS_WEIGHT = -10; // Negative weight because more dependents decrease the score
-    private static final int ADDRESS_STABILITY_WEIGHT = 10;
-    private static final int JOB_STABILITY_WEIGHT = 10;
-    private static final int NATIONALITY_WEIGHT = 5;
-    private static final int REPAYMENT_HISTORY_WEIGHT = 30;
+
+    private final FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
+
+    private static int AGE_WEIGHT;
+    private static int MONTHLY_INCOME_WEIGHT ;
+    private static int BUSINESS_REVENUE_WEIGHT;
+    private static int DEPENDENTS_WEIGHT; // Negative weight because more dependents decrease the score
+    private static int ADDRESS_STABILITY_WEIGHT;
+    private static int JOB_STABILITY_WEIGHT;
+    private static int NATIONALITY_WEIGHT;
+    private static int REPAYMENT_HISTORY_WEIGHT;
 
     // Constants for threshold values
-    private static final int MIN_AGE = 18;
-    private static final int MIN_MONTHLY_INCOME = 100000;
-    private static final int MIN_BUSINESS_REVENUE = 1000000;
+    private static int MIN_AGE;
+    private static int MIN_MONTHLY_INCOME;
+    private static int MIN_BUSINESS_REVENUE;
 
-    private static final int POOR_SCORE_MAX_LOAN = 60000;
-    private static final int FAIR_SCORE_MAX_LOAN = 100000;
-    private static final int GOOD_SCORE_MAX_LOAN = 500000;
-    private static final int VERY_GOOD_SCORE_MAX_LOAN = 1200000;
-    private static final int EXCELLENT_SCORE_MAX_LOAN = 5000000;
+    private static int POOR_SCORE_MAX_LOAN;
+    private static int FAIR_SCORE_MAX_LOAN;
+    private static int GOOD_SCORE_MAX_LOAN;
+    private static int VERY_GOOD_SCORE_MAX_LOAN;
+    private static int EXCELLENT_SCORE_MAX_LOAN;
 
     private int calculatedCreditAmount;
     private int creditScore;
@@ -28,6 +42,7 @@ public class CreditScoreCalculator {
 
     // Calculate credit score based on provided data
     public int calculateCreditScore(PersonalInformation personalInfo) {
+
         int creditScore = 0;
 
         // Age factor
@@ -60,7 +75,7 @@ public class CreditScoreCalculator {
         // Repayment history factor (assuming this information is available)
         creditScore += REPAYMENT_HISTORY_WEIGHT;
 
-        // Ensure credit score is within a valid range (0 to 1000, for example)
+        // Ensure credit score is within a valid range (0 to 150, for example)
         creditScore = Math.max(0, Math.min(150, creditScore));
 
         return creditScore;
@@ -114,7 +129,65 @@ public class CreditScoreCalculator {
 
         return loanAmount + (loanAmount * interestRateDecimal * durationInYears);
     }
+//
+//    public void setFactors(){
+//
+//        firestoreCRUD.getAllDocuments("creditScoreSettings", task -> {
+//
+//
+//            if (task.isSuccessful()){
+//                for (QueryDocumentSnapshot documentSnapshot : task.getResult()  ) {
+//
+//                    CreditScoreSettings creditScoreSettings = documentSnapshot.toObject(CreditScoreSettings.class);
+//
+//
 
+//
+//                }
+//            }else {
+//                Log.d("CreditScoreCalculator",task.getException().getMessage());
+//            }
+//
+//        });
+//
+//    }
+
+    public CompletableFuture<Void> setFactors() {
+        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+
+        firestoreCRUD.getAllDocuments("creditScoreSettings", task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                    CreditScoreSettings creditScoreSettings = documentSnapshot.toObject(CreditScoreSettings.class);
+                    AGE_WEIGHT = creditScoreSettings.getAgeWeight();
+                    MONTHLY_INCOME_WEIGHT = creditScoreSettings.getMonthlyIncomeWeight();
+                    BUSINESS_REVENUE_WEIGHT = creditScoreSettings.getBusinessRevenueWeight();
+                    DEPENDENTS_WEIGHT = creditScoreSettings.getDependentsWeight(); // Negative weight because more dependents decrease the score
+                    ADDRESS_STABILITY_WEIGHT = creditScoreSettings.getAddressStabilityWeight();
+                    JOB_STABILITY_WEIGHT = creditScoreSettings.getJobStabilityWeight();
+                    NATIONALITY_WEIGHT = creditScoreSettings.getNationalityWeight();
+                    REPAYMENT_HISTORY_WEIGHT = creditScoreSettings.getRepaymentHistoryWeight();
+
+                    // Constants for threshold values
+                    MIN_AGE = creditScoreSettings.getMinAge();
+                    MIN_MONTHLY_INCOME = creditScoreSettings.getMinMonthlyIncome();
+                    MIN_BUSINESS_REVENUE = creditScoreSettings.getMinBusinessRevenue();
+
+                    POOR_SCORE_MAX_LOAN = creditScoreSettings.getPoorScoreMaxLoan();
+                    FAIR_SCORE_MAX_LOAN = creditScoreSettings.getFairScoreMaxLoan();
+                    GOOD_SCORE_MAX_LOAN = creditScoreSettings.getGoodScoreMaxLoan();
+                    VERY_GOOD_SCORE_MAX_LOAN = creditScoreSettings.getVeryGoodScoreMaxLoan();
+                    EXCELLENT_SCORE_MAX_LOAN = creditScoreSettings.getExcellentScoreMaxLoan();
+
+                }
+                completableFuture.complete(null); // Complete the future when factors are loaded
+            } else {
+                completableFuture.completeExceptionally(task.getException()); // Complete exceptionally if there's an error
+            }
+        });
+
+        return completableFuture;
+    }
 
 
 }

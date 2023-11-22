@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,7 +39,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private UserManager userManager = new UserManager(TransactionHistoryActivity.this);
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private String uid = userManager.getCurrentUser().getUid();
-    private TextView loanTypeTxt,requestedDateTxt;
+    private TextView loanTypeTxt,requestedDateTxt,noContentTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         ArrayList<RepaymentItem> repaymentItems = new ArrayList<>();
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        noContentTxt = findViewById(R.id.no_content_found);
         RepaymentAdapter adapter = new RepaymentAdapter(repaymentItems);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -99,6 +101,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                         transactionIds.add(transactionId); // Add transaction ID to ArrayList
                         requestedDates.add(requestedDate);
                         loanTypes.add(loanType);
+
+
                     }
                     // Convert ArrayList to array
                     loanHistory[0] = transactionIds.toArray(new String[0]);
@@ -129,28 +133,33 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                 loanTypeTxt.setText("Loan Type: "+loan_type);
                 requestedDateTxt.setText("Requested Date: "+date);
 
+                // Show ProgressDialog
+                ProgressDialog progressDialog = new ProgressDialog(TransactionHistoryActivity.this);
+                progressDialog.setMessage("Processing...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                // Show ProgressDialog
+                firestoreCRUD.queryDocuments("Repayment", "transactionId", selectedTransId, task -> {
+                    if (task.isSuccessful()) {
+                        repaymentItems.clear(); // Clear the list before adding new items
 
-                firestoreCRUD.queryDocuments("Repayment", "transactionId", selectedTransId, new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("NotifyDataSetChanged")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            repaymentItems.clear(); // Clear the list before adding new items
-
-                            for (DocumentSnapshot document : task.getResult()) {
-                                RepaymentItem repaymentItem = document.toObject(RepaymentItem.class);
-                                if (repaymentItem != null) {
-                                    Log.d("repaymentItem", document.getString("status"));
-                                    repaymentItems.add(repaymentItem);
-                                }
+                        for (DocumentSnapshot document : task.getResult()) {
+                            RepaymentItem repaymentItem = document.toObject(RepaymentItem.class);
+                            if (repaymentItem != null) {
+                                Log.d("repaymentItem", document.getString("status"));
+                                repaymentItems.add(repaymentItem);
+                                progressDialog.dismiss();
+                            }else {
+                                noContentTxt.setVisibility(View.VISIBLE);
+                                progressDialog.dismiss();
                             }
-                            // Sort repaymentItems by date
-                            sortRepaymentItemsByDate(repaymentItems);
-                            // Notify the adapter that the data set has changed
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            Toast.makeText(TransactionHistoryActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
+                        // Sort repaymentItems by date
+                        sortRepaymentItemsByDate(repaymentItems);
+                        // Notify the adapter that the data set has changed
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(TransactionHistoryActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 

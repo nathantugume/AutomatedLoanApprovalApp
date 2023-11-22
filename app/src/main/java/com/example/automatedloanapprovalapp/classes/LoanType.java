@@ -46,7 +46,18 @@ public class LoanType {
     }
 
     public String getDuration() {
+
         return duration;
+    }
+    public int getDurationAsInt() {
+        try {
+            // Attempt to parse the duration string to an integer
+            return Integer.parseInt(duration);
+        } catch (NumberFormatException e) {
+            // Handle the case where the parsing fails
+            e.printStackTrace(); // Log the exception or handle it as needed
+            return 0; // Default value or another appropriate value
+        }
     }
 
     public void setDuration(String duration) {

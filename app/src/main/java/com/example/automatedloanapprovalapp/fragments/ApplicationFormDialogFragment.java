@@ -24,9 +24,13 @@ import com.example.automatedloanapprovalapp.R;
 import com.example.automatedloanapprovalapp.classes.CreditScoreCalculator;
 import com.example.automatedloanapprovalapp.classes.FirestoreCRUD;
 import com.example.automatedloanapprovalapp.classes.LoanType;
+import com.example.automatedloanapprovalapp.classes.Notification;
 import com.example.automatedloanapprovalapp.classes.Transaction;
 import com.example.automatedloanapprovalapp.classes.UserManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
@@ -51,6 +55,7 @@ public class ApplicationFormDialogFragment extends DialogFragment {
     private UserManager userManager = new UserManager(getContext());
     private FirestoreCRUD firestoreCRUD = new FirestoreCRUD();
     private CreditScoreCalculator creditScoreCalculator = new CreditScoreCalculator();
+
     private double calculatedPayback;
     private String uid = userManager.getCurrentUser().getUid();
 
@@ -65,6 +70,8 @@ public class ApplicationFormDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_application_form_dialog, null);
+
+        creditScoreCalculator.setFactors();
 
         loanTypeTextView = view.findViewById(R.id.textViewLoanType);
         interestRateTextView = view.findViewById(R.id.textViewInterestRate);
@@ -163,13 +170,24 @@ public class ApplicationFormDialogFragment extends DialogFragment {
                 String formattedDate = dateFormat.format(currentDate);
 
 
-                Transaction transaction = new Transaction(uid, selectedLoanType.getType(), amount, calculatedPayback, formattedDate, "pending");
+                Transaction transaction = new Transaction(uid, selectedLoanType.getType(), amount, calculatedPayback, formattedDate, "pending",calculatedPayback);
                 firestoreCRUD.createDocument("transaction", transaction, task -> {
                     // Dismiss ProgressDialog
                     progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
+
+                        Notification notification = new Notification("New loan application added","management",uid,formattedDate);
+                        firestoreCRUD.createDocument("notifications", notification, task1 -> {
+                            if (task1.isSuccessful()){
+                                Log.d("Notification","notification sent successfully");
+                            }
+                            else {
+                                Log.d("Notification", task1.getException().getMessage());
+                            }
+                        });
                         Toast.makeText(view.getContext(), "Loan Request Submitted Successfully", Toast.LENGTH_LONG).show();
+
                     } else {
                         Toast.makeText(view.getContext(), Objects.requireNonNull(task.getException()).toString(), Toast.LENGTH_SHORT).show();
                     }
