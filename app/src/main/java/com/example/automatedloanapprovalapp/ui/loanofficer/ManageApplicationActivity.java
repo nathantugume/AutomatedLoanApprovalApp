@@ -203,6 +203,7 @@ public class ManageApplicationActivity extends AppCompatActivity implements Tran
                                 String phoneNumber = snapshot.getString("phoneNumber");
                                                            Transaction transaction = new Transaction();
                                 transaction.disburseFunds(ManageApplicationActivity.this,phoneNumber,amount,transactionId,paybackAmount);
+                                progressDialog.dismiss();
                             }else
                             {
                                 Toast.makeText(ManageApplicationActivity.this, task1.getException().getMessage(), Toast.LENGTH_SHORT).show();

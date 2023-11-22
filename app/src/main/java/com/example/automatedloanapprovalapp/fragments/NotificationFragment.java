@@ -183,20 +183,17 @@ public class NotificationFragment extends Fragment {
                 status.put(uid, "viewed");
                 notification1.setUserStatusMap(status);
 
-                firestoreCRUD.updateDocument("notifications", selectedNotificationId, notification1, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            if (user.getRole().equals("loan_manager")){
-                                startActivity(new Intent(getContext(), ManageApplicationActivity.class));
-                            }else if (user.getRole().equals("admin")){
-                                startActivity(new Intent(getContext(), AdminManageLoanActivity.class));
-                            } else if (user.getRole().equals("customer")) {
-                                startActivity(new Intent(getContext(), ApplicationStatusActivity.class));
-
-                            }
+                firestoreCRUD.updateDocument("notifications", selectedNotificationId, notification1, task -> {
+                    if (task.isSuccessful()){
+                        if (user.getRole().equals("loan_manager")){
+                            startActivity(new Intent(getContext(), ManageApplicationActivity.class));
+                        }else if (user.getRole().equals("admin")){
+                            startActivity(new Intent(getContext(), AdminManageLoanActivity.class));
+                        } else if (user.getRole().equals("customer")) {
+                            startActivity(new Intent(getContext(), ApplicationStatusActivity.class));
 
                         }
+
                     }
                 });
 
